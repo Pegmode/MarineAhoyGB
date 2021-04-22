@@ -32,3 +32,15 @@ OAMGMemCopy:
 	inc c
 	dec d
 	jp nz,OAMGMemCopy
+
+;Input requirements: hl = destination, bc = legnth
+clearMem:
+	xor a
+.clearLoop
+	ld [hl+], a
+	dec bc
+	cp c
+	jr nz,.clearLoop
+	cp b
+	jr nz,.clearLoop
+	ret

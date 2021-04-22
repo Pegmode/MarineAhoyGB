@@ -83,6 +83,10 @@ write4WideMetaSprite:
     add hl,de
     ret
 
+;hl =  start of 1st tile ref
+swapXPos:
+    
+
 ;swaps the x positions in a 4 wide meta sprite, mirrored on a vertical axis along the center
 ;hl = current pos in row
 flipXPos:

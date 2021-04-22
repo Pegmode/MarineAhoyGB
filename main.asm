@@ -47,6 +47,10 @@ codeInit:
     ;ld a, %00010001;diable lcd old
     ld a, %00010011;diable lcd
     ld [rLCDC], a
+    ;clear vram
+    ld hl,_VRAM
+    ld bc, $A000 - $8000
+    call clearMem
     call LoadNormalPallet
     ld hl, PlaceholderBG_map_data
     ld bc, _SCRN0
