@@ -20,3 +20,7 @@ MACRO Write4WideMetaSpriteNorm
     ld [hl],a
     add hl,de
 ENDM
+
+MACRO BREAKPOINT
+    ld b,b
+ENDM

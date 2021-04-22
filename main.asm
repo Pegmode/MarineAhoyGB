@@ -94,14 +94,41 @@ vBlankRoutine:
     ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
     cp 0
     jr z,.SyncEventExit
+.checkBounceEvent
     cp 2
-    jr nz,.SyncEventExit
+    jr nz,.checkTalkEvent;bounce event
     ld a, 1
     ld [BounceOffset] ,a
     ld hl,$c100+3
     call flipMetaSpiteY
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
+    reti 
+.checkTalkEvent
+    cp 3
+    jr nz, .SyncEventExit;talk event
+    xor a
+    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset snyc
+    ld a, [$c101]
+    ld b, a
+    ld a, [TalkEventFlag]
+    cp 0
+    jr nz, .incTalkEvent
+    ld a, 1
+    ld [TalkEventFlag], a
+    ld a,b
+    add a, 4
+    ld hl,$c101
+    call moveMetaSpriteX
+    reti
+.incTalkEvent
+    xor a
+    ld [TalkEventFlag], a
+    ld a, b
+    sub a, 4
+    ld hl,$c101
+    call moveMetaSpriteX
+    reti
 .SyncEventExit
     reti
 
@@ -113,113 +140,7 @@ timerRoutine:
 include "utils.asm"
 include "videoUtils.asm"
 include "DMGBVGM.asm"
-
-
-
-; a = pos , hl = start sprite ADDRESS
-moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write pls no booli
-    ld de,4
-    ;r1
-    call write4WideMetaSprite
-    ;r2
-    add a,8
-    call write4WideMetaSprite
-    ;r3
-    add a,8
-    call write4WideMetaSprite
-    ;r4
-    add a,8
-    call write4WideMetaSprite
-    ;r5
-    add a,8
-    call write4WideMetaSprite
-    ret
-
-;hl = start address, a = value to write
-flipMetaSpiteY:
-    ld a, [hl]
-    ld b,%00100000
-    xor a,b
-    ld de,4
-    call write4WideMetaSprite
-    call write4WideMetaSprite
-    call write4WideMetaSprite
-    call write4WideMetaSprite
-    call write4WideMetaSprite
-    ld hl,$C100 + 1
-    call flipXPos
-    call flipXPos
-    call flipXPos
-    call flipXPos
-    call flipXPos
-    ret
-
-;writes an entire row of values for a 4 wide meta sprite
-;hl = start address, a = value to write
-write4WideMetaSprite:
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ret
-
-;swaps the x positions in a 4 wide meta sprite, mirrored on a vertical axis along the center
-;hl = current pos in row
-flipXPos:
-    ;swap pos 3
-    push hl;save hl address
-    ld de,12
-    ld b, [hl];save current
-    add hl,de
-    ld c, [hl]
-    ld [hl],b;save current to advance
-    pop hl
-    ld [hl],c
-    ld de,4
-    add hl,de
-    ;swap pos 1
-    push hl;save hl address
-    ld de,4
-    ld b, [hl];save current
-    add hl,de
-    ld c, [hl]
-    ld [hl],b;save current to advance
-    pop hl
-    ld [hl],c
-    ld de,3*4
-    add hl,de
-    ret
-    
-
-
-BounceAdvance:
-    ld b, 0
-    ld a,[BounceOffset]
-    ld d,a
-    ld c,a
-    ld hl, bounceSpriteTable
-    add hl,bc
-    ld a,[hl]
-    push af
-    push de
-    ld hl, $c100
-    call moveMetaSpriteY
-    pop de
-    pop af
-    cp $50;starting position for sprite
-    jr z,.bounceEnd
-    inc d;not end of table
-    ld a, d
-    ld [BounceOffset], a
-    ret
-.bounceEnd;end of table
-    xor a
-    ld [BounceOffset], a
-    ret
+include "metaSpriteUtils.asm"
     
 bounceTable:;DO NOT USE THE FIRST VALUE
     db    $FF,$8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
