@@ -52,3 +52,19 @@ StartDMATransfer:
 	call _HRAM + 1;Start Transfer (no memory access)
 	pop bc
 	ret
+;Wait for VBlank
+;==========================================================
+;wait for Beginning of vBlank
+;holds for a long time
+;stat %xxxxxx01
+WaitVBlank:
+	ld a,[rSTAT]
+	bit 0,a
+	jr nz,WaitVBlank;wait for non vBlankState
+.waitforVBlank;
+	ld a,[rSTAT]
+	bit 0,a
+	jr z,.waitforVBlank
+	bit 1,a
+	jr nz,.waitforVBlank
+	ret

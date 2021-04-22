@@ -115,6 +115,7 @@ include "DMGBVGM.asm"
 
 ; a = pos , hl = start sprite ADDRESS
 moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
+    ld b,b
     ld de,4
     ;r1
     ld [hl],a
@@ -124,6 +125,7 @@ moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
     ld [hl],a
     add hl,de
     ld [hl],a
+    add hl,de
     ;r2
     add a,8
     ld [hl],a
@@ -133,6 +135,7 @@ moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
     ld [hl],a
     add hl,de
     ld [hl],a
+    add hl,de
     ;r3
     add a,8
     ld [hl],a
@@ -142,6 +145,7 @@ moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
     ld [hl],a
     add hl,de
     ld [hl],a
+    add hl,de
     ;r4
     add a,8
     ld [hl],a
@@ -151,6 +155,7 @@ moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
     ld [hl],a
     add hl,de
     ld [hl],a
+    add hl,de
     ;r5
     add a,8
     ld [hl],a
@@ -160,6 +165,7 @@ moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
     ld [hl],a
     add hl,de
     ld [hl],a
+    add hl,de
     ret
 
 BounceAdvance:
