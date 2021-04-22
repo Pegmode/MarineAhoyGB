@@ -33,10 +33,10 @@ WaitBlank:
 DMATransCode:
 	ld a,$C1;N_ShadowOAM
 	ld [rDMA],a ;initiate DMA Transfer from N_ShadowOAM to OAM
-  ld      a, $28 ;wait 128 micro seconds while transfer completes
+	ld a, $28 ;wait 128 micro seconds while transfer completes
 .loop:
-	dec     a
-	jr     nz, .loop
+	dec a
+	jr nz, .loop
 	ret
 ;StartDMATransfer
 ;==========================================================

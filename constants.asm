@@ -12,5 +12,5 @@ PlaceholderMetaSprite_tile_map_size EQU $0400
 PlaceholderMetaSprite_tile_map_width EQU $20
 PlaceholderMetaSprite_tile_map_height EQU $20
 
-PlaceholderMetaSprite_tile_data_size EQU $0140
-PlaceholderMetaSprite_tile_count EQU $14
+PlaceholderMetaSprite_tile_data_size EQU $0130
+PlaceholderMetaSprite_tile_count EQU $13

@@ -98,6 +98,11 @@ vBlankRoutine:
     jr nz,.SyncEventExit
     ld a, 1
     ld [BounceOffset] ,a
+    ld hl,$c100+3
+    ld a, [hl]
+    ld b,%00100000
+    xor a,b
+    call flipMetaSpiteY
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
 .SyncEventExit
@@ -128,6 +133,49 @@ moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write pls n
     ;r5
     Write4WideMetaSpriteNorm
     ret
+
+flipMetaSpiteY:
+    ld de,4
+    Write4WideMetaSprite1st
+    Write4WideMetaSprite1st
+    Write4WideMetaSprite1st
+    Write4WideMetaSprite1st
+    Write4WideMetaSprite1st
+    ld hl,$C100 + 1
+    call flipXPos
+    call flipXPos
+    call flipXPos
+    call flipXPos
+    call flipXPos
+    ret
+
+;hl = current pos in row
+flipXPos:
+    ;swap pos 3
+    push hl;save hl address
+    ld de,12
+    ld b, [hl];save current
+    add hl,de
+    ld c, [hl]
+    ld [hl],b;save current to advance
+    pop hl
+    ld [hl],c
+    ld de,4
+    add hl,de
+    ;swap pos 1
+    push hl;save hl address
+    ld de,4
+    ld b, [hl];save current
+    add hl,de
+    ld c, [hl]
+    ld [hl],b;save current to advance
+    pop hl
+    ld [hl],c
+    ld de,3*4
+    add hl,de
+    ret
+    
+
 
 BounceAdvance:
     ld b, 0
@@ -176,10 +224,10 @@ testOAM:
     db 104, 24, $5f, 0
     db 104, 32, $60, 0
     db 104, 40, $61, 0
-    db 112, 16, $62, 0
-    db 112, 24, $63, 0
-    db 112, 32, $64, 0
-    db 112, 40, $65, 0
+    db 112, 16, $0, 0;;remove zeroth entries later
+    db 112, 24, $62, 0
+    db 112, 32, $63, 0
+    db 112, 40, $0, 0
 
 ;GRAPHICS DATA
 ;===========================================================================
