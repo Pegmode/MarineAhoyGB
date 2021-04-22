@@ -96,10 +96,6 @@ vBlankRoutine:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
 .SyncEventExit
-    ld a,[$C100]
-    inc a
-    ld hl,$C100
-    call moveMetaSpriteY
     reti
 
 timerRoutine:
@@ -114,8 +110,7 @@ include "DMGBVGM.asm"
 
 
 ; a = pos , hl = start sprite ADDRESS
-moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
-    ld b,b
+moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write pls no booli
     ld de,4
     ;r1
     ld [hl],a
@@ -173,11 +168,16 @@ BounceAdvance:
     ld a,[BounceOffset]
     ld d,a
     ld c,a
-    ld hl, bounceTable
+    ld hl, bounceSpriteTable
     add hl,bc
     ld a,[hl]
-    ld [rSCY],a
-    cp 0
+    push af
+    push de
+    ld hl, $c100
+    call moveMetaSpriteY
+    pop de
+    pop af
+    cp $50;starting position for sprite
     jr z,.bounceEnd
     inc d;not end of table
     ld a, d
