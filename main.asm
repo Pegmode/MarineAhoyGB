@@ -145,6 +145,7 @@ flipMetaSpiteY:
     call write4WideMetaSprite
     call write4WideMetaSprite
     call write4WideMetaSprite
+    call write4WideMetaSprite
     ld hl,$C100 + 1
     call flipXPos
     call flipXPos
