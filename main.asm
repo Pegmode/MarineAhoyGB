@@ -99,9 +99,6 @@ vBlankRoutine:
     ld a, 1
     ld [BounceOffset] ,a
     ld hl,$c100+3
-    ld a, [hl]
-    ld b,%00100000
-    xor a,b
     call flipMetaSpiteY
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
@@ -123,24 +120,31 @@ include "DMGBVGM.asm"
 moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write pls no booli
     ld de,4
     ;r1
-    Write4WideMetaSprite1st
+    call write4WideMetaSprite
     ;r2
-    Write4WideMetaSpriteNorm
+    add a,8
+    call write4WideMetaSprite
     ;r3
-    Write4WideMetaSpriteNorm
+    add a,8
+    call write4WideMetaSprite
     ;r4
-    Write4WideMetaSpriteNorm
+    add a,8
+    call write4WideMetaSprite
     ;r5
-    Write4WideMetaSpriteNorm
+    add a,8
+    call write4WideMetaSprite
     ret
 
+;hl = start address, a = value to write
 flipMetaSpiteY:
+    ld a, [hl]
+    ld b,%00100000
+    xor a,b
     ld de,4
-    Write4WideMetaSprite1st
-    Write4WideMetaSprite1st
-    Write4WideMetaSprite1st
-    Write4WideMetaSprite1st
-    Write4WideMetaSprite1st
+    call write4WideMetaSprite
+    call write4WideMetaSprite
+    call write4WideMetaSprite
+    call write4WideMetaSprite
     ld hl,$C100 + 1
     call flipXPos
     call flipXPos
@@ -149,6 +153,20 @@ flipMetaSpiteY:
     call flipXPos
     ret
 
+;writes an entire row of values for a 4 wide meta sprite
+;hl = start address, a = value to write
+write4WideMetaSprite:
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ret
+
+;swaps the x positions in a 4 wide meta sprite, mirrored on a vertical axis along the center
 ;hl = current pos in row
 flipXPos:
     ;swap pos 3
