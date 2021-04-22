@@ -23,7 +23,9 @@ jp codeInit
 
 SECTION "code",ROM0[$150]
 codeInit:
-
+    xor a
+    ldh [DMVGM_SYNC_HIGH_ADDRESS], a
+    ld [BounceOffset], a;init bounce
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
@@ -32,20 +34,37 @@ codeInit:
     ld a, %100;enable timer
 .continueInit
     ld [rIE], a
-    
     call DMEngineInit
     ld a, 1
     ld [SoundStatus],a
+.loadBG
+    call WaitBlank
+    ld a, %00010001;diable lcd
+    ld [rLCDC], a
+    call LoadNormalPallet
+    ld hl, PlaceholderBG_map_data
+    ld bc, _SCRN0
+    ld de, PlaceholderBG_tile_map_size
+    call MemCopyLong
+    ld hl, PlaceholderBG_tile_data
+    ld bc, $8000
+    ld de, PlaceholderBG_tile_data_size
+    call MemCopyLong
+    ld a, [rLCDC]
+    set 7,a;enable lcd
+    ld [rLCDC],a
     ei
 
 main:;main loop
 .checkSyncEvent
-    ldh a,[DMVGM_SYNC_HIGH_ADDRES]
+    ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
     cp 0
     jr z,.SyncEventExit
-    ld b,b;
+    cp 2
+    jr nz,.SyncEventExit
+    ld b,b
     xor a
-    ldh [DMVGM_SYNC_HIGH_ADDRES],a;reset sync register
+    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
 .SyncEventExit
     jp main
 
@@ -57,7 +76,41 @@ timerRoutine:
     call DMEngineUpdate
     reti
 
+
+include "utils.asm"
+include "videoUtils.asm"
 include "DMGBVGM.asm"
+
+BounceAdvance:
+    ld b, 0
+    ld a,[BounceOffset]
+    ld d,a
+    ld c,a
+    ld hl, bounceTable
+    add hl,bc
+    ld a,[hl]
+    ld [rSCY],a
+    cp 0
+    jr z,.bounceEnd
+    inc d;not end of table
+    ld a, d
+    ld [BounceOffset], a
+    ret
+.bounceEnd;end of table
+    xor a
+    ld [BounceOffset], a
+    ret
+    
+bounceTable:; s
+    $8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
+
+;GRAPHICS DATA
+;===========================================================================
+SECTION "Graphics Data",ROMX,BANK[1]
+include "Graphics/PlaceholderBG.asm"
+
+;MUSIC DATA
+;===========================================================================
 SECTION "SoundData0",ROMX,BANK[2]
 incbin "ahoySongData/ahoy0.bin"
 SECTION "SoundData1",ROMX,BANK[3]

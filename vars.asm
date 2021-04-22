@@ -8,3 +8,4 @@ VgmLookupPointer:    ;current frame pointer
 VgmLookupPointerHigh:ds 1
 VgmLookupPointerLow: ds 1
 SoundWaitFrames:     ds 1;number of frames to currently wait
+BounceOffset:        ds 1
