@@ -25,13 +25,13 @@ SECTION "code",ROM0[$150]
 codeInit:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
-    ld [BounceOffset], a;init bounce
+    ld [BounceOffset], a;init bounce 
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
     ld a, $c4;ahoy tma
     ld [rTMA],a
-    ld a, %100;enable timer
+    ld a, %101;enable timer and vblank
 .continueInit
     ld [rIE], a
     call DMEngineInit
@@ -57,22 +57,30 @@ codeInit:
 
 main:;main loop
 .checkSyncEvent
+    halt
+    jp main
+
+vBlankRoutine:
+.checkCurrentBounceFrame
+    ld a, [BounceOffset]
+    cp 0
+    jr z,.checkSyncEvent
+    call BounceAdvance
+.checkSyncEvent
     ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
     cp 0
     jr z,.SyncEventExit
     cp 2
     jr nz,.SyncEventExit
-    ld b,b
+    ld a, 1
+    ld [BounceOffset] ,a
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
 .SyncEventExit
-    jp main
-
-vBlankRoutine:
-    call DMEngineUpdate
     reti
 
 timerRoutine:
+
     call DMEngineUpdate
     reti
 
@@ -80,6 +88,8 @@ timerRoutine:
 include "utils.asm"
 include "videoUtils.asm"
 include "DMGBVGM.asm"
+
+
 
 BounceAdvance:
     ld b, 0
@@ -101,8 +111,8 @@ BounceAdvance:
     ld [BounceOffset], a
     ret
     
-bounceTable:; s
-    $8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
+bounceTable:;DO NOT USE THE FIRST VALUE
+db    $FF,$8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
 
 ;GRAPHICS DATA
 ;===========================================================================
