@@ -8,9 +8,9 @@ PlaceholderBG_tile_map_height EQU $20
 PlaceholderBG_tile_data_size EQU $0520
 PlaceholderBG_tile_count EQU $52
 
-PlaceholderMetaSprite_tile_map_size EQU $14
-PlaceholderMetaSprite_tile_map_width EQU $04
-PlaceholderMetaSprite_tile_map_height EQU $05
+PlaceholderMetaSprite_tile_map_size EQU $0400
+PlaceholderMetaSprite_tile_map_width EQU $20
+PlaceholderMetaSprite_tile_map_height EQU $20
 
 PlaceholderMetaSprite_tile_data_size EQU $0140
 PlaceholderMetaSprite_tile_count EQU $14

@@ -1,12 +1,11 @@
-;Engine Skeleton ROM
+;ahoy ROM by Pegmode
+;original by Houshou Marine
+include "macros.asm"
 include "hardware.asm"
 include "constants.asm"
 include "vars.asm"
-SECTION "TMA VALUES",ROM0[$1]
-;use patcher to change these values, set tmaTac to 0 to disable 
-tmaMod: db $C3 
-tmaTac: db %100;4096 hz
-db "DMGBVGM by Pegmode"
+SECTION "Header",ROM0[$1]
+
 
 SECTION "vBlank IRQ",ROM0[$40]
 vBlankIRQ:
@@ -15,6 +14,11 @@ SECTION "Timer IRQ",ROM0[$50]
 timerIRQ:
     jp timerRoutine
 
+SECTION "Title",ROM0[$134]
+db "ahoyGB";15 char
+SECTION "Manufacturer",ROM0[$13F]
+db "peg"
+
 SECTION "MBCDefinition",ROM0[$147]
     dw CART_MBC5
 
@@ -22,6 +26,7 @@ SECTION "EntryPoint",ROM0[$100]
 jp codeInit
 
 SECTION "code",ROM0[$150]
+db "AhoyGB code/music by pegmode, Art by Gaplan, Original by Houshou Marine"
 codeInit:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
@@ -113,54 +118,15 @@ include "DMGBVGM.asm"
 moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write pls no booli
     ld de,4
     ;r1
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
+    Write4WideMetaSprite1st
     ;r2
-    add a,8
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
+    Write4WideMetaSpriteNorm
     ;r3
-    add a,8
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
+    Write4WideMetaSpriteNorm
     ;r4
-    add a,8
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
+    Write4WideMetaSpriteNorm
     ;r5
-    add a,8
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
-    ld [hl],a
-    add hl,de
+    Write4WideMetaSpriteNorm
     ret
 
 BounceAdvance:
