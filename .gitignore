@@ -1,0 +1,7 @@
+*.exe
+*.bak
+*.sym
+*.map
+*.obj
+*.gb
+.vscode/
