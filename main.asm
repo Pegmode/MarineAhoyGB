@@ -39,7 +39,8 @@ codeInit:
     ld [SoundStatus],a
 .loadBG
     call WaitBlank
-    ld a, %00010001;diable lcd
+    ;ld a, %00010001;diable lcd old
+    ld a, %00010011;diable lcd
     ld [rLCDC], a
     call LoadNormalPallet
     ld hl, PlaceholderBG_map_data
@@ -50,6 +51,23 @@ codeInit:
     ld bc, $8000
     ld de, PlaceholderBG_tile_data_size
     call MemCopyLong
+    ;start 0x8520, tiles 52-65
+    ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
+    ld hl,PlaceholderMetaSprite_tile_data
+    ld bc,$8520
+    ld de, PlaceholderMetaSprite_tile_data_size 
+    call MemCopyLong
+    ld hl, testOAM
+    ld bc, $FE00
+    ld d, 80
+    call MemCopy
+    ld hl, testOAM
+    ld bc, $C100 ;DMA stuff
+    ld d, 80
+    call MemCopy
+    ;obj pallet
+    ld a,$E4
+	ld [rOBP0],a
     ld a, [rLCDC]
     set 7,a;enable lcd
     ld [rLCDC],a
@@ -61,6 +79,7 @@ main:;main loop
     jp main
 
 vBlankRoutine:
+    call StartDMATransfer
 .checkCurrentBounceFrame
     ld a, [BounceOffset]
     cp 0
@@ -77,10 +96,13 @@ vBlankRoutine:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
 .SyncEventExit
+    ld a,[$C100]
+    inc a
+    ld hl,$C100
+    call moveMetaSpriteY
     reti
 
 timerRoutine:
-
     call DMEngineUpdate
     reti
 
@@ -90,6 +112,55 @@ include "videoUtils.asm"
 include "DMGBVGM.asm"
 
 
+
+; a = pos , hl = start sprite ADDRESS
+moveMetaSpriteY:;smoves a 4x5 sprite,duplicate code for vblank speed write
+    ld de,4
+    ;r1
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    ;r2
+    add a,8
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    ;r3
+    add a,8
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    ;r4
+    add a,8
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    ;r5
+    add a,8
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    add hl,de
+    ld [hl],a
+    ret
 
 BounceAdvance:
     ld b, 0
@@ -112,12 +183,37 @@ BounceAdvance:
     ret
     
 bounceTable:;DO NOT USE THE FIRST VALUE
-db    $FF,$8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
+    db    $FF,$8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
+bounceSpriteTable:
+    db    $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
+
+testOAM:
+    db 80, 16, $52, 0
+    db 80, 24, $53, 0
+    db 80, 32, $54, 0
+    db 80, 40, $55, 0
+    db 88, 16, $56, 0
+    db 88, 24, $57, 0
+    db 88, 32, $58, 0
+    db 88, 40, $59, 0
+    db 96, 16, $5a, 0
+    db 96, 24, $5b, 0
+    db 96, 32, $5c, 0
+    db 96, 40, $5d, 0
+    db 104, 16, $5e, 0
+    db 104, 24, $5f, 0
+    db 104, 32, $60, 0
+    db 104, 40, $61, 0
+    db 112, 16, $62, 0
+    db 112, 24, $63, 0
+    db 112, 32, $64, 0
+    db 112, 40, $65, 0
 
 ;GRAPHICS DATA
 ;===========================================================================
 SECTION "Graphics Data",ROMX,BANK[1]
 include "Graphics/PlaceholderBG.asm"
+include "Graphics/PlaceholderMetaSprite.asm"
 
 ;MUSIC DATA
 ;===========================================================================
