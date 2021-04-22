@@ -39,7 +39,14 @@ codeInit:
     ei
 
 main:;main loop
-    halt
+.checkSyncEvent
+    ldh a,[DMVGM_SYNC_HIGH_ADDRES]
+    cp 0
+    jr z,.SyncEventExit
+    ld b,b;
+    xor a
+    ldh [DMVGM_SYNC_HIGH_ADDRES],a;reset sync register
+.SyncEventExit
     jp main
 
 vBlankRoutine:
@@ -51,27 +58,27 @@ timerRoutine:
     reti
 
 include "DMGBVGM.asm"
-SECTION "SoundData0",ROMX,BANK[1]
+SECTION "SoundData0",ROMX,BANK[2]
 incbin "ahoySongData/ahoy0.bin"
-SECTION "SoundData1",ROMX,BANK[2]
+SECTION "SoundData1",ROMX,BANK[3]
 incbin "ahoySongData/ahoy1.bin"
-SECTION "SoundData2",ROMX,BANK[3]
+SECTION "SoundData2",ROMX,BANK[4]
 incbin "ahoySongData/ahoy2.bin"
-SECTION "SoundData3",ROMX,BANK[4]
+SECTION "SoundData3",ROMX,BANK[5]
 incbin "ahoySongData/ahoy3.bin"
-SECTION "SoundData4",ROMX,BANK[5]
+SECTION "SoundData4",ROMX,BANK[6]
 incbin "ahoySongData/ahoy4.bin"
-SECTION "SoundData5",ROMX,BANK[6]
+SECTION "SoundData5",ROMX,BANK[7]
 incbin "ahoySongData/ahoy5.bin"
-SECTION "SoundData6",ROMX,BANK[7]
+SECTION "SoundData6",ROMX,BANK[8]
 incbin "ahoySongData/ahoy6.bin"
-SECTION "SoundData7",ROMX,BANK[8]
+SECTION "SoundData7",ROMX,BANK[9]
 incbin "ahoySongData/ahoy7.bin"
-SECTION "SoundData8",ROMX,BANK[9]
+SECTION "SoundData8",ROMX,BANK[10]
 incbin "ahoySongData/ahoy8.bin"
-SECTION "SoundData9",ROMX,BANK[10]
+SECTION "SoundData9",ROMX,BANK[11]
 incbin "ahoySongData/ahoy9.bin"
-SECTION "SoundData10",ROMX,BANK[11]
+SECTION "SoundData10",ROMX,BANK[12]
 incbin "ahoySongData/ahoy10.bin"
-SECTION "SoundData11",ROMX,BANK[12]
+SECTION "SoundData11",ROMX,BANK[13]
 incbin "ahoySongData/ahoy11.bin"
