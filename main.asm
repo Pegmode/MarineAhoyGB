@@ -236,7 +236,6 @@ MarineMetaSprite:
 ;===========================================================================
 SECTION "Graphics Data",ROMX,BANK[1]
 include "Graphics/PlaceholderBG.asm"
-include "Graphics/PlaceholderMetaSprite.asm"
 include "Graphics/ChillTanFontTiles.asm"
 include "Graphics/marineSprite1.asm"
 ;MUSIC DATA
