@@ -66,9 +66,9 @@ codeInit:
     call MemCopyLong
     ;start 0x8520, tiles 52-65
     ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
-    ld hl,PlaceholderMetaSprite_tile_data
+    ld hl,marineSprite1_tile_data
     ld bc,$8520
-    ld de, PlaceholderMetaSprite_tile_data_size 
+    ld de, marineSprite1_tile_data_size
     call MemCopyLong
     ld hl, MarineMetaSprite
     ld bc, $FE00
@@ -118,21 +118,29 @@ UpdateFadeScreen:
     call FadePallet
     cp 0
     jr nz,.endFadeUpdate
+    ;when the fade is done
+    call CreditsScreenInit
+    ld a, 2
+    ld [CurrentScreen], a;set the current screen to Credits screeen
+.endFadeUpdate
+    ret
+    
+CreditsScreenInit:
     ;change to next screen
     call WaitVBlank
     ld a, [rLCDC]
     res 7, a
     ld [rLCDC], a
+    ld hl, _VRAM
+    ld bc, $2000
+    call clearMem
     ld hl, ChillTanFontTile
     ld bc, _VRAM
     ld de, ChillTanTileDataSize
     call MemCopyLong
     call LoadNormalPallet
-    ld a, 2
-    ld [CurrentScreen], a
-.endFadeUpdate
     ret
-    
+
 UpdateMainScreen:
     call StartDMATransfer
 .checkCurrentBounceFrame
@@ -187,9 +195,9 @@ timerRoutine:
     call DMEngineUpdate
     ld bc, 1
     ld a, b
-    ld [rROMB0], a
-    ld a, c
     ld [rROMB1], a
+    ld a, c
+    ld [rROMB0], a
     reti
 
 
@@ -229,7 +237,8 @@ MarineMetaSprite:
 SECTION "Graphics Data",ROMX,BANK[1]
 include "Graphics/PlaceholderBG.asm"
 include "Graphics/PlaceholderMetaSprite.asm"
-
+include "Graphics/ChillTanFontTiles.asm"
+include "Graphics/marineSprite1.asm"
 ;MUSIC DATA
 ;===========================================================================
 SECTION "SoundData0",ROMX,BANK[2]
