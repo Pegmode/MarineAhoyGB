@@ -12,3 +12,5 @@ BounceOffset:        ds 1
 TalkEventFlag:       ds 1
 FadeCounter:         ds 1
 CurrentScreen:       ds 1;0:main, 1:fade transition, 2:LoadCredits
+NewJoyData:          ds 1
+OldJoyData:          ds 1

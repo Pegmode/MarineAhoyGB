@@ -31,6 +31,8 @@ jp codeInit
 SECTION "code",ROM0[$150]
 db "AhoyGB code/music by pegmode, Art by Gaplan, Original song by Houshou Marine"
 codeInit:
+    di
+    ld sp,$FFCC
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
     ld [BounceOffset], a;init bounce
@@ -96,86 +98,6 @@ main:;main loop
     halt
     jp main
 
-;SCREENS
-;===========================================================================
-
-UpdateFadeScreen:
-    call FadePallet
-    cp 0
-    jr nz,.endFadeUpdate
-    ;when the fade is done
-    call CreditsScreenInit
-    ld a, 2
-    ld [CurrentScreen], a;set the current screen to Credits screeen
-.endFadeUpdate
-    ret
-    
-CreditsScreenInit:
-    ;change to next screen
-    call WaitVBlank
-    ld a, [rLCDC]
-    res 7, a
-    ld [rLCDC], a
-    ld hl, _VRAM
-    ld bc, $2000
-    call clearMem
-    ld hl, ChillTanFontTile
-    ld bc, _VRAM
-    ld de, ChillTanTileDataSize
-    call MemCopyLong
-    call LoadNormalPallet
-    ret
-
-UpdateMainScreen:
-    call StartDMATransfer
-.checkCurrentBounceFrame
-    ld a, [BounceOffset]
-    cp 0
-    jr z,.checkSyncEvent
-    call  BounceX
-    call BounceAdvance
-.checkSyncEvent
-    ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
-    cp 0
-    jr z,.SyncEventExit
-.checkBounceEvent
-    cp 2
-    jr nz,.checkTalkEvent;bounce event
-    ld a, 1
-    ld [BounceOffset] ,a
-    ld hl,$c100+3
-    call flipMetaSpiteY
-    xor a
-    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
-    ret
-.checkTalkEvent
-    cp 3
-    jr nz, .SyncEventExit;talk event
-    xor a
-    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset snyc
-    ld a, [$c101]
-    ld b, a
-    ld a, [TalkEventFlag]
-    cp 0
-    jr nz, .incTalkEvent
-    ld a, 1
-    ld [TalkEventFlag], a
-    ld a,b
-    add a, 4
-    ld hl,$c101
-    call moveMetaSpriteX
-    ret
-.incTalkEvent
-    xor a
-    ld [TalkEventFlag], a
-    ld a, b
-    sub a, 4
-    ld hl,$c101
-    call moveMetaSpriteX
-    ret
-.SyncEventExit
-    ret
-
 ;INTERRUPTS
 ;===========================================================================
 
@@ -193,7 +115,12 @@ vBlankRoutine:
 .checkCreditsScreen
     cp 2
     jr nz,.improperScreen
-
+    call ReadJoy
+    ld a, [OldJoyData]
+    cp $1
+    jr nz,.tt
+    jp codeInit;RESTART ROM
+.tt
     reti
 .improperScreen
     BREAKPOINT;something bad happened
@@ -211,7 +138,8 @@ timerRoutine:
 ;OTHER
 ;===========================================================================
 
-
+include "mainScreen.asm"
+include "creditsScreen.asm"
 include "utils.asm"
 include "videoUtils.asm"
 include "DMGBVGM.asm"
@@ -249,6 +177,8 @@ SECTION "Graphics Data",ROMX,BANK[1]
 include "Graphics/PlaceholderBG.asm"
 include "Graphics/ChillTanFontTiles.asm"
 include "Graphics/marineSprite1.asm"
+creditsText:
+incbin "Graphics/creditsText.txt"
 ;MUSIC DATA
 ;===========================================================================
 SECTION "SoundData0",ROMX,BANK[2]
