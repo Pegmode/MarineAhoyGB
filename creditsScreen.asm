@@ -14,6 +14,11 @@ CreditsScreenInit:
     call LoadNormalPallet
     ld de, $9821
     call writeCreditsTextToScreen
+    ld de, codeTable
+    ld hl, SModePTR
+    ld [hl], d
+    inc hl
+    ld [hl], e
     ld a, %10010001
     ld [rLCDC], a
     ret
@@ -59,7 +64,42 @@ writeCreditsTextToScreen:
     pop hl
     inc bc
     jr .scanChar
-    
+.exit
+    ret
+
+;    :X
+checkSModeCode:;debug
+    ld a, [NewJoyData]
+    cp 0
+    jr z,.exit
+    ld b, a
+    ld hl,SModePTR
+    ld a, [hl+]
+    ld c, a
+    ld a, [hl]
+    ld l, a
+    ld h, c
+    ld a, [hl]
+    cp b
+    jr nz, .reset
+    inc hl
+    ld d, h
+    ld e, l
+    ld hl, SModePTR
+    ld [hl], d
+    inc hl
+    ld [hl], e
+    ld a, $E3
+    ld [SMode],a
+    ret
+.reset
+    xor a
+    ld [SMode], a 
+    ld de, codeTable
+    ld hl, SModePTR
+    ld [hl], d
+    inc hl
+    ld [hl], e
 .exit
     ret
 
@@ -82,3 +122,6 @@ ASCIITileTable:
     db $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $36, $37, $38
     ;  q    r    s    t    u    v    w    x    y   z
     db $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42
+
+codeTable:
+    db $40,$40,$80,$80,$20,$10,$20,$10,$2,$1,$8

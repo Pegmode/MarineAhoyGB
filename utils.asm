@@ -83,13 +83,3 @@ ReadJoy:
 	ld [rP1],A;Reset Joypad
 	ret
 
-;returns filtered joy state
-getJoy:
-	ld a, [NewJoyData]
-	ld b, a
-	ld a, [OldJoyData]
-	sub a, b
-	jr z,.exit
-	xor a
-.exit
-	ret

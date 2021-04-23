@@ -58,3 +58,20 @@ UpdateFadeScreen:
     ld [CurrentScreen], a;set the current screen to Credits screeen
 .endFadeUpdate
     ret
+
+SLoad:
+    ;start 0x8520, tiles 52-65
+    ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
+    ld hl,debugSprite_tile_data
+    ld bc,$8520
+    ld de, debugSprite_tile_data_size
+    call MemCopyLong
+    ld hl, DebugMetaSprite
+    ld bc, $FE00
+    ld d, 80
+    call MemCopy
+    ld hl, DebugMetaSprite
+    ld bc, $C100 ;DMA stuff
+    ld d, 80
+    call MemCopy
+    ret

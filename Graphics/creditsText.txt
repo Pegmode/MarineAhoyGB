@@ -5,4 +5,5 @@ Houshou Marine
 Code/Music: Pegmode
 Art: Gaplan
 
-Press A to restart*
+Press Start button
+to restart*

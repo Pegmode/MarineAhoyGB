@@ -68,6 +68,13 @@ codeInit:
     ld bc, $8000
     ld de, PlaceholderBG_tile_data_size
     call MemCopyLong
+    ;smode
+    ld a, [SMode]
+    cp $E3
+    jr nz,.normalLoad
+    call SLoad
+    jr .endSpriteLoad
+.normalLoad
     ;start 0x8520, tiles 52-65
     ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
     ld hl,marineSprite1_tile_data
@@ -82,6 +89,7 @@ codeInit:
     ld bc, $C100 ;DMA stuff
     ld d, 80
     call MemCopy
+.endSpriteLoad
     ld a, FADE_WAIT_LENGTH
     ld [FadeCounter], a
     ;obj pallet
@@ -116,8 +124,9 @@ vBlankRoutine:
     cp 2
     jr nz,.improperScreen
     call ReadJoy
+    call checkSModeCode
     ld a, [OldJoyData]
-    cp $1
+    cp $8
     jr nz,.tt
     jp codeInit;RESTART ROM
 .tt
@@ -144,7 +153,6 @@ include "utils.asm"
 include "videoUtils.asm"
 include "DMGBVGM.asm"
 include "metaSpriteUtils.asm"
-    
 
 bounceSpriteTable:;vertical
     db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
@@ -171,12 +179,35 @@ MarineMetaSprite:
     db 112, 32, $63, 0
     db 112, 40, $0, 0
 
+DebugMetaSprite:
+    db 80, 16, $52, 0
+    db 80, 24, $53, 0
+    db 80, 32, $54, 0
+    db 80, 40, $55, 0
+    db 88, 16, $56, 0
+    db 88, 24, $57, 0
+    db 88, 32, $58, 0
+    db 88, 40, $59, 0
+    db 96, 16, $5a, 0
+    db 96, 24, $5b, 0
+    db 96, 32, $5c, 0
+    db 96, 40, $5d, 0
+    db 104, 16, $5e, 0
+    db 104, 24, $5f, 0
+    db 104, 32, $60, 0
+    db 104, 40, $61, 0
+    db 112, 16, $62, 0
+    db 112, 24, $63, 0
+    db 112, 32, $64, 0
+    db 112, 40, $65, 0
+
 ;GRAPHICS DATA
 ;===========================================================================
 SECTION "Graphics Data",ROMX,BANK[1]
 include "Graphics/PlaceholderBG.asm"
 include "Graphics/ChillTanFontTiles.asm"
 include "Graphics/marineSprite1.asm"
+include "Graphics/debugSprite.asm"
 creditsText:
 incbin "Graphics/creditsText.txt"
 ;MUSIC DATA

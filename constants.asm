@@ -9,6 +9,8 @@ PlaceholderBG_tile_map_height EQU $20
 PlaceholderBG_tile_data_size EQU $0520
 PlaceholderBG_tile_count EQU $52
 
+debugSprite_tile_data_size EQU $0140
+debugSprite_tile_count EQU $14
 
 marineSprite1_tile_data_size EQU $0120
 marineSprite1_tile_count EQU $12
