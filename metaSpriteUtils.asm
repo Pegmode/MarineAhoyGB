@@ -62,12 +62,12 @@ flipMetaSpiteY:
     call write4WideMetaSprite
     call write4WideMetaSprite
     call write4WideMetaSprite
-    ld hl,$C100 + 1
-    call flipXPos
-    call flipXPos
-    call flipXPos
-    call flipXPos
-    call flipXPos
+    ld hl,$C100 + 2
+    call flipTiles
+    call flipTiles
+    call flipTiles
+    call flipTiles
+    call flipTiles
     ret
 
 ;writes an entire row of values for a 4 wide meta sprite
@@ -83,13 +83,9 @@ write4WideMetaSprite:
     add hl,de
     ret
 
-;hl =  start of 1st tile ref
-swapXPos:
-    
-
-;swaps the x positions in a 4 wide meta sprite, mirrored on a vertical axis along the center
+;swaps the positions in a 4 wide meta sprite, mirrored on a vertical axis along the center
 ;hl = current pos in row
-flipXPos:
+flipTiles:
     ;swap pos 3
     push hl;save hl address
     ld de,12
@@ -113,7 +109,28 @@ flipXPos:
     ld de,3*4
     add hl,de
     ret
+
     
+BounceX:
+    ld a, [$C100 + 3]
+    ld hl, $C100 + 1
+    bit 5, a
+    jr nz,.moveLeft;if bit 5 is 1
+    ld a, [hl]
+    sub a, 1
+    call moveMetaSpriteX
+    ret
+.moveLeft
+    ld a, [hl]
+    add a, 1
+    call moveMetaSpriteX
+    ret
+
+
+    
+
+
+
 
 BounceAdvance:
     ld b, 0

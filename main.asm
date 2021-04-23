@@ -26,7 +26,7 @@ SECTION "EntryPoint",ROM0[$100]
 jp codeInit
 
 SECTION "code",ROM0[$150]
-db "AhoyGB code/music by pegmode, Art by Gaplan, Original by Houshou Marine"
+db "AhoyGB code/music by pegmode, Art by Gaplan, Original song by Houshou Marine"
 codeInit:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
@@ -80,6 +80,9 @@ codeInit:
     ld a, [rLCDC]
     set 7,a;enable lcd
     ld [rLCDC],a
+    ld a, 1;we want even distance so set to 1
+    ld [TalkEventFlag],a
+
     ei
 
 main:;main loop
@@ -93,6 +96,7 @@ vBlankRoutine:
     ld a, [BounceOffset]
     cp 0
     jr z,.checkSyncEvent
+    call  BounceX
     call BounceAdvance
 .checkSyncEvent
     ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
@@ -146,10 +150,9 @@ include "videoUtils.asm"
 include "DMGBVGM.asm"
 include "metaSpriteUtils.asm"
     
-bounceTable:;DO NOT USE THE FIRST VALUE
-    db    $FF,$8,$F,$15,$1A,$1E,$21,$23,$24,$24,$23,$21,$1E,$1A,$15,$F,$8,$0
-bounceSpriteTable:
-    db    $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
+
+bounceSpriteTable:;vertical
+    db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
 
 testOAM:
     db 80, 16, $52, 0
