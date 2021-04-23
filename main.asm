@@ -16,6 +16,7 @@ timerIRQ:
 
 SECTION "Title",ROM0[$134]
 db "ahoyGB";15 char
+
 SECTION "Manufacturer",ROM0[$13F]
 db "peg"
 
@@ -30,7 +31,8 @@ db "AhoyGB code/music by pegmode, Art by Gaplan, Original song by Houshou Marine
 codeInit:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
-    ld [BounceOffset], a;init bounce 
+    ld [BounceOffset], a;init bounce
+    ld [CurrentScreen], a 
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
@@ -68,14 +70,16 @@ codeInit:
     ld bc,$8520
     ld de, PlaceholderMetaSprite_tile_data_size 
     call MemCopyLong
-    ld hl, testOAM
+    ld hl, MarineMetaSprite
     ld bc, $FE00
     ld d, 80
     call MemCopy
-    ld hl, testOAM
+    ld hl, MarineMetaSprite
     ld bc, $C100 ;DMA stuff
     ld d, 80
     call MemCopy
+    ld a, FADE_WAIT_LENGTH
+    ld [FadeCounter], a
     ;obj pallet
     ld a,$E4
 	ld [rOBP0],a
@@ -84,15 +88,48 @@ codeInit:
     ld [rLCDC],a
     ld a, 1;we want even distance so set to 1
     ld [TalkEventFlag],a
-
     ei
 
 main:;main loop
-.checkSyncEvent
     halt
     jp main
 
 vBlankRoutine:
+    ld a, [CurrentScreen]
+    cp 0
+    jr nz,.checkFadeScreen
+    call UpdateMainScreen
+    reti
+.checkFadeScreen
+    cp 1
+    jr nz,.checkCreditsScreen
+    call UpdateFadeScreen
+    reti
+.checkCreditsScreen
+    cp 2
+    jr nz,.improperScreen
+
+    reti
+.improperScreen
+    BREAKPOINT;something bad happened
+    reti
+
+UpdateFadeScreen:
+    call FadePallet
+    cp 0
+    jr nz,.endFadeUpdate
+    ;change to next screen
+    call WaitVBlank
+    ld a, [rLCDC]
+    res 7, a
+    ld [rLCDC], a
+
+    ld a, 2
+    ld [CurrentScreen], a
+.endFadeUpdate
+    ret
+    
+UpdateMainScreen:
     call StartDMATransfer
 .checkCurrentBounceFrame
     ld a, [BounceOffset]
@@ -113,7 +150,7 @@ vBlankRoutine:
     call flipMetaSpiteY
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
-    reti 
+    ret
 .checkTalkEvent
     cp 3
     jr nz, .SyncEventExit;talk event
@@ -130,7 +167,7 @@ vBlankRoutine:
     add a, 4
     ld hl,$c101
     call moveMetaSpriteX
-    reti
+    ret
 .incTalkEvent
     xor a
     ld [TalkEventFlag], a
@@ -138,12 +175,17 @@ vBlankRoutine:
     sub a, 4
     ld hl,$c101
     call moveMetaSpriteX
-    reti
+    ret
 .SyncEventExit
-    reti
+    ret
 
 timerRoutine:
     call DMEngineUpdate
+    ld bc, 1
+    ld a, b
+    ld [rROMB0], a
+    ld a, c
+    ld [rROMB1], a
     reti
 
 
@@ -156,7 +198,7 @@ include "metaSpriteUtils.asm"
 bounceSpriteTable:;vertical
     db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
 
-testOAM:
+MarineMetaSprite:
     db 80, 16, $52, 0
     db 80, 24, $53, 0
     db 80, 32, $54, 0
@@ -173,7 +215,7 @@ testOAM:
     db 104, 24, $5f, 0
     db 104, 32, $60, 0
     db 104, 40, $61, 0
-    db 112, 16, $0, 0;;remove zeroth entries later
+    db 112, 16, $0, 0;keep for simplicity
     db 112, 24, $62, 0
     db 112, 32, $63, 0
     db 112, 40, $0, 0
