@@ -43,13 +43,15 @@ codeInit:
     ld a, 1
     ld [SoundStatus],a
 .loadBG
-    call WaitBlank
-    ;ld a, %00010001;diable lcd old
-    ld a, %00010011;diable lcd
+    call WaitVBlank
+    ld a, %00010011;disable lcd
     ld [rLCDC], a
     ;clear vram
     ld hl,_VRAM
     ld bc, $A000 - $8000
+    call clearMem
+    ld hl, $c100
+    ld bc, $800
     call clearMem
     call LoadNormalPallet
     ld hl, PlaceholderBG_map_data
