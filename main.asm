@@ -26,6 +26,8 @@ SECTION "MBCDefinition",ROM0[$147]
 SECTION "EntryPoint",ROM0[$100]
 jp codeInit
 
+;CODE
+;===========================================================================
 SECTION "code",ROM0[$150]
 db "AhoyGB code/music by pegmode, Art by Gaplan, Original song by Houshou Marine"
 codeInit:
@@ -94,25 +96,8 @@ main:;main loop
     halt
     jp main
 
-vBlankRoutine:
-    ld a, [CurrentScreen]
-    cp 0
-    jr nz,.checkFadeScreen
-    call UpdateMainScreen
-    reti
-.checkFadeScreen
-    cp 1
-    jr nz,.checkCreditsScreen
-    call UpdateFadeScreen
-    reti
-.checkCreditsScreen
-    cp 2
-    jr nz,.improperScreen
-
-    reti
-.improperScreen
-    BREAKPOINT;something bad happened
-    reti
+;SCREENS
+;===========================================================================
 
 UpdateFadeScreen:
     call FadePallet
@@ -191,6 +176,29 @@ UpdateMainScreen:
 .SyncEventExit
     ret
 
+;INTERRUPTS
+;===========================================================================
+
+vBlankRoutine:
+    ld a, [CurrentScreen]
+    cp 0
+    jr nz,.checkFadeScreen
+    call UpdateMainScreen
+    reti
+.checkFadeScreen
+    cp 1
+    jr nz,.checkCreditsScreen
+    call UpdateFadeScreen
+    reti
+.checkCreditsScreen
+    cp 2
+    jr nz,.improperScreen
+
+    reti
+.improperScreen
+    BREAKPOINT;something bad happened
+    reti
+
 timerRoutine:
     call DMEngineUpdate
     ld bc, 1
@@ -199,6 +207,9 @@ timerRoutine:
     ld a, c
     ld [rROMB0], a
     reti
+
+;OTHER
+;===========================================================================
 
 
 include "utils.asm"

@@ -13,6 +13,6 @@ PlaceholderBG_tile_count EQU $52
 marineSprite1_tile_data_size EQU $0120
 marineSprite1_tile_count EQU $12
 
-ChillTanTileSize EQU 66
+ChillTanTileSize EQU 68
 ChillTanTileDataSize EQU ChillTanTileSize * 16
 
