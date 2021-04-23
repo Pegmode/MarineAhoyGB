@@ -15,3 +15,6 @@ PlaceholderMetaSprite_tile_map_height EQU $20
 
 PlaceholderMetaSprite_tile_data_size EQU $0130
 PlaceholderMetaSprite_tile_count EQU $13
+
+ChillTanTileSize EQU 67
+ChillTanTileDataSize EQU ChillTanTileSize * 16

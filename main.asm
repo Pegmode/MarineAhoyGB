@@ -123,7 +123,11 @@ UpdateFadeScreen:
     ld a, [rLCDC]
     res 7, a
     ld [rLCDC], a
-
+    ld hl, ChillTanFontTile
+    ld bc, _VRAM
+    ld de, ChillTanTileDataSize
+    call MemCopyLong
+    call LoadNormalPallet
     ld a, 2
     ld [CurrentScreen], a
 .endFadeUpdate
