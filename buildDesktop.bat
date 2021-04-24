@@ -1,8 +1,9 @@
 @echo off
 set project_name=ahoyGB
 set bgb="E:\Gb Dev\emu\BGB64.exe"
+set debugMode = 1
 
-TASKKILL /IM "BGB64.exe" /F
+TASKKILL /IM "BGB64.exe" /F 2>NUL
 
 rgbasm -o%project_name%.obj main.asm
 if %errorlevel% neq 0 call :exit 1
