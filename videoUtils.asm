@@ -4,6 +4,26 @@ LoadNormalPallet:
 	ld a,$E4
 	ld [$FF47],a
 	ret
+
+;fades BG and OBP0 assuming that they're the same value
+;returns a with the new value of rBGP
+FadePallet:
+	ld a, [FadeCounter]
+	dec a
+	jr z,.fadeFrame
+	ld [FadeCounter], a
+	ret
+.fadeFrame
+	ld a, FADE_WAIT_LENGTH
+	ld [FadeCounter], a
+	call WaitBlank
+	ld a, [rBGP]
+	sla a
+	sla a
+	ld [rBGP], a
+	ld [rOBP0], a
+	ret
+
 ;Copy data to Vram (for tiles and map)
 ;===========================================================
 ; Input requirements: de = VRAM address, hl = data start address, c = tile data size

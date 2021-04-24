@@ -16,6 +16,7 @@ timerIRQ:
 
 SECTION "Title",ROM0[$134]
 db "ahoyGB";15 char
+
 SECTION "Manufacturer",ROM0[$13F]
 db "peg"
 
@@ -25,12 +26,17 @@ SECTION "MBCDefinition",ROM0[$147]
 SECTION "EntryPoint",ROM0[$100]
 jp codeInit
 
+;CODE
+;===========================================================================
 SECTION "code",ROM0[$150]
 db "AhoyGB code/music by pegmode, Art by Gaplan, Original song by Houshou Marine"
 codeInit:
+    di
+    ld sp,$FFCC
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
-    ld [BounceOffset], a;init bounce 
+    ld [BounceOffset], a;init bounce
+    ld [CurrentScreen], a 
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
@@ -62,20 +68,30 @@ codeInit:
     ld bc, $8000
     ld de, PlaceholderBG_tile_data_size
     call MemCopyLong
+    ;smode
+    ld a, [SMode]
+    cp $E3
+    jr nz,.normalLoad
+    call SLoad
+    jr .endSpriteLoad
+.normalLoad
     ;start 0x8520, tiles 52-65
     ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
-    ld hl,PlaceholderMetaSprite_tile_data
+    ld hl,marineSprite1_tile_data
     ld bc,$8520
-    ld de, PlaceholderMetaSprite_tile_data_size 
+    ld de, marineSprite1_tile_data_size
     call MemCopyLong
-    ld hl, testOAM
+    ld hl, MarineMetaSprite
     ld bc, $FE00
     ld d, 80
     call MemCopy
-    ld hl, testOAM
+    ld hl, MarineMetaSprite
     ld bc, $C100 ;DMA stuff
     ld d, 80
     call MemCopy
+.endSpriteLoad
+    ld a, FADE_WAIT_LENGTH
+    ld [FadeCounter], a
     ;obj pallet
     ld a,$E4
 	ld [rOBP0],a
@@ -84,79 +100,69 @@ codeInit:
     ld [rLCDC],a
     ld a, 1;we want even distance so set to 1
     ld [TalkEventFlag],a
-
     ei
 
 main:;main loop
-.checkSyncEvent
     halt
     jp main
 
+;INTERRUPTS
+;===========================================================================
 vBlankRoutine:
-    call StartDMATransfer
-.checkCurrentBounceFrame
-    ld a, [BounceOffset]
+    ld a, [CurrentScreen]
     cp 0
-    jr z,.checkSyncEvent
-    call  BounceX
-    call BounceAdvance
-.checkSyncEvent
-    ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
-    cp 0
-    jr z,.SyncEventExit
-.checkBounceEvent
+    jr nz,.checkFadeScreen
+    call UpdateMainScreen
+    reti
+.checkFadeScreen
+    cp 1
+    jr nz,.checkCreditsScreen
+    call UpdateFadeScreen
+    reti
+.checkCreditsScreen
     cp 2
-    jr nz,.checkTalkEvent;bounce event
-    ld a, 1
-    ld [BounceOffset] ,a
-    ld hl,$c100+3
-    call flipMetaSpiteY
-    xor a
-    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
-    reti 
-.checkTalkEvent
-    cp 3
-    jr nz, .SyncEventExit;talk event
-    xor a
-    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset snyc
-    ld a, [$c101]
-    ld b, a
-    ld a, [TalkEventFlag]
+    jr nz,.improperScreen
+    ld a, [DropBounceState]
     cp 0
-    jr nz, .incTalkEvent
-    ld a, 1
-    ld [TalkEventFlag], a
-    ld a,b
-    add a, 4
-    ld hl,$c101
-    call moveMetaSpriteX
+    jr z, .notInDropBounce
+    call DropBounceCalc
+    
+.notInDropBounce
+    call ReadJoy
+    call checkSModeCode
+    ld a, [OldJoyData]
+    cp $8
+    jr nz,.dontRestart
+    jp codeInit;RESTART ROM
+.dontRestart
     reti
-.incTalkEvent
-    xor a
-    ld [TalkEventFlag], a
-    ld a, b
-    sub a, 4
-    ld hl,$c101
-    call moveMetaSpriteX
-    reti
-.SyncEventExit
+.improperScreen
+    BREAKPOINT;something bad happened
     reti
 
 timerRoutine:
     call DMEngineUpdate
+    ld bc, 1
+    ld a, b
+    ld [rROMB1], a
+    ld a, c
+    ld [rROMB0], a
     reti
 
+;OTHER
+;===========================================================================
 
+include "mainScreen.asm"
+include "creditsScreen.asm"
 include "utils.asm"
 include "videoUtils.asm"
 include "DMGBVGM.asm"
 include "metaSpriteUtils.asm"
-    
 
 bounceSpriteTable:;vertical
     db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
 
-testOAM:
+MarineMetaSprite:
     db 80, 16, $52, 0
     db 80, 24, $53, 0
     db 80, 32, $54, 0
@@ -173,17 +179,42 @@ testOAM:
     db 104, 24, $5f, 0
     db 104, 32, $60, 0
     db 104, 40, $61, 0
-    db 112, 16, $0, 0;;remove zeroth entries later
+    db 112, 16, $0, 0;keep for simplicity
     db 112, 24, $62, 0
     db 112, 32, $63, 0
     db 112, 40, $0, 0
+
+DebugMetaSprite:
+    db 80, 16, $52, 0
+    db 80, 24, $53, 0
+    db 80, 32, $54, 0
+    db 80, 40, $55, 0
+    db 88, 16, $56, 0
+    db 88, 24, $57, 0
+    db 88, 32, $58, 0
+    db 88, 40, $59, 0
+    db 96, 16, $5a, 0
+    db 96, 24, $5b, 0
+    db 96, 32, $5c, 0
+    db 96, 40, $5d, 0
+    db 104, 16, $5e, 0
+    db 104, 24, $5f, 0
+    db 104, 32, $60, 0
+    db 104, 40, $61, 0
+    db 112, 16, $62, 0
+    db 112, 24, $63, 0
+    db 112, 32, $64, 0
+    db 112, 40, $65, 0
 
 ;GRAPHICS DATA
 ;===========================================================================
 SECTION "Graphics Data",ROMX,BANK[1]
 include "Graphics/PlaceholderBG.asm"
-include "Graphics/PlaceholderMetaSprite.asm"
-
+include "Graphics/ChillTanFontTiles.asm"
+include "Graphics/marineSprite1.asm"
+include "Graphics/debugSprite.asm"
+creditsText:
+incbin "Graphics/creditsText.txt"
 ;MUSIC DATA
 ;===========================================================================
 SECTION "SoundData0",ROMX,BANK[2]

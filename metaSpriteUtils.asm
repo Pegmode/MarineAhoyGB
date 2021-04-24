@@ -110,7 +110,6 @@ flipTiles:
     add hl,de
     ret
 
-    
 BounceX:
     ld a, [$C100 + 3]
     ld hl, $C100 + 1
@@ -125,12 +124,6 @@ BounceX:
     add a, 1
     call moveMetaSpriteX
     ret
-
-
-    
-
-
-
 
 BounceAdvance:
     ld b, 0

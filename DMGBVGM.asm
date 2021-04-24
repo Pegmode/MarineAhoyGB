@@ -17,7 +17,7 @@ DMEngineUpdate:
 .checkEngineStatus;check if the engine is currently playing a song
     ld a,[SoundStatus]
     cp 1
-    jr z,.checkIsWaitFrame
+    jr z,.checkIsWaitFrame;is engine playing?
     ret
 .checkIsWaitFrame;check if the engine is currently in a wait state
     ld a,[SoundWaitFrames]
@@ -87,6 +87,9 @@ DMEngineUpdate:
     ;No need to set up registers for quiet status. should be done in tracker via envelopes, OFF or ECxx
     xor a
     ld [SoundStatus],a
+    ;custom for marine ROM
+    ld a, 1
+    ld [CurrentScreen], a
     jr .endFrame
 .errorInCheck
     ;handle stuff
