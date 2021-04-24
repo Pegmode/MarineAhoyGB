@@ -16,3 +16,5 @@ NewJoyData:          ds 1
 OldJoyData:          ds 1
 SMode:               ds 1
 SModePTR:            ds 2
+DropBouncePTR:       ds 2
+DropBounceState:     ds 1

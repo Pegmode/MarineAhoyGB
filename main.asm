@@ -108,7 +108,6 @@ main:;main loop
 
 ;INTERRUPTS
 ;===========================================================================
-
 vBlankRoutine:
     ld a, [CurrentScreen]
     cp 0
@@ -123,13 +122,19 @@ vBlankRoutine:
 .checkCreditsScreen
     cp 2
     jr nz,.improperScreen
+    ld a, [DropBounceState]
+    cp 0
+    jr z, .notInDropBounce
+    call DropBounceCalc
+    
+.notInDropBounce
     call ReadJoy
     call checkSModeCode
     ld a, [OldJoyData]
     cp $8
-    jr nz,.tt
+    jr nz,.dontRestart
     jp codeInit;RESTART ROM
-.tt
+.dontRestart
     reti
 .improperScreen
     BREAKPOINT;something bad happened
