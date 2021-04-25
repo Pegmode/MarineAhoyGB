@@ -36,7 +36,8 @@ codeInit:
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS], a
     ld [BounceOffset], a;init bounce
-    ld [CurrentScreen], a 
+    ld [ShortBounceOffset], a
+    ld [CurrentScreen], a ;main screen
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
@@ -110,17 +111,17 @@ main:;main loop
 ;===========================================================================
 vBlankRoutine:
     ld a, [CurrentScreen]
-    cp 0
+    cp MAIN_SCREEN
     jr nz,.checkFadeScreen
     call UpdateMainScreen
     reti
 .checkFadeScreen
-    cp 1
+    cp FADE_MAIN_TRANSITION
     jr nz,.checkCreditsScreen
     call UpdateFadeScreen
     reti
 .checkCreditsScreen
-    cp 2
+    cp CREDITS_SCREEN
     jr nz,.improperScreen
     ld a, [DropBounceState]
     cp 0
@@ -161,6 +162,8 @@ include "metaSpriteUtils.asm"
 
 bounceSpriteTable:;vertical
     db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
+shortBounceSpriteTable:
+    db $FF,$4C,$49,$47,$46,$46,$47,$49,$4C,$50
 
 MarineMetaSprite:
     db 80, 16, $52, 0

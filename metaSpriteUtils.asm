@@ -150,3 +150,27 @@ BounceAdvance:
     ld [BounceOffset], a
     ret
     
+ShortBounceAdvance:
+    ld b, 0
+    ld a,[ShortBounceOffset]
+    ld d,a
+    ld c,a
+    ld hl, shortBounceSpriteTable
+    add hl,bc
+    ld a,[hl]
+    push af
+    push de
+    ld hl, $c100
+    call moveMetaSpriteY
+    pop de
+    pop af
+    cp $50;starting position for sprite
+    jr z,.bounceEnd
+    inc d;not end of table
+    ld a, d
+    ld [ShortBounceOffset], a
+    ret
+.bounceEnd;end of table
+    xor a
+    ld [ShortBounceOffset], a
+    ret

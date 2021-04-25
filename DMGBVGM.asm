@@ -88,7 +88,7 @@ DMEngineUpdate:
     xor a
     ld [SoundStatus],a
     ;custom for marine ROM
-    ld a, 1
+    ld a, FADE_MAIN_TRANSITION
     ld [CurrentScreen], a
     jr .endFrame
 .errorInCheck

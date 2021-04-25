@@ -2,6 +2,16 @@ DMVGM_SYNC_HIGH_ADDRESS EQU $80;address $FFxx that the sync command writes to. D
 DMVGM_START_BANK EQU 2
 FADE_WAIT_LENGTH EQU 25
 
+;screens
+MAIN_SCREEN EQU 0
+FADE_MAIN_TRANSITION EQU 1
+CREDITS_SCREEN EQU 2
+;eventCommands
+EVENT_BOUNCE EQU 2
+EVENT_TALK EQU 3
+EVENT_SHORT_BOUNCE EQU 4
+
+
 PlaceholderBG_tile_map_size EQU $0400
 PlaceholderBG_tile_map_width EQU $20
 PlaceholderBG_tile_map_height EQU $20

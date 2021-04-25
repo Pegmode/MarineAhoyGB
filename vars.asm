@@ -18,3 +18,4 @@ SMode:               ds 1
 SModePTR:            ds 2
 DropBouncePTR:       ds 2
 DropBounceState:     ds 1
+ShortBounceOffset:   ds 1

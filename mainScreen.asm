@@ -3,15 +3,20 @@ UpdateMainScreen:
 .checkCurrentBounceFrame
     ld a, [BounceOffset]
     cp 0
-    jr z,.checkSyncEvent
+    jr z,.checkCurrentShortBounceFrame
     call  BounceX
     call BounceAdvance
+.checkCurrentShortBounceFrame
+    ld a, [ShortBounceOffset]
+    cp 0
+    jr z,.checkSyncEvent
+    call ShortBounceAdvance
 .checkSyncEvent
     ldh a,[DMVGM_SYNC_HIGH_ADDRESS]
     cp 0
     jr z,.SyncEventExit
 .checkBounceEvent
-    cp 2
+    cp EVENT_BOUNCE
     jr nz,.checkTalkEvent;bounce event
     ld a, 1
     ld [BounceOffset] ,a
@@ -21,8 +26,8 @@ UpdateMainScreen:
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
     ret
 .checkTalkEvent
-    cp 3
-    jr nz, .SyncEventExit;talk event
+    cp EVENT_TALK
+    jr nz, .checkShortBounceEvent;
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset snyc
     ld a, [$c101]
@@ -45,6 +50,13 @@ UpdateMainScreen:
     ld hl,$c101
     call moveMetaSpriteX
     ret
+.checkShortBounceEvent
+    cp EVENT_SHORT_BOUNCE
+    jr nz, .SyncEventExit
+    ld a, 1
+    ld [ShortBounceOffset] ,a
+    xor a
+    ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
 .SyncEventExit
     ret
 
@@ -54,7 +66,7 @@ UpdateFadeScreen:
     jr nz,.endFadeUpdate
     ;when the fade is done
     call CreditsScreenInit
-    ld a, 2
+    ld a, CREDITS_SCREEN
     ld [CurrentScreen], a;set the current screen to Credits screeen
 .endFadeUpdate
     ret
