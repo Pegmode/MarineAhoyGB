@@ -54,5 +54,13 @@ birds_tile_count EQU $02
 ChillTanTileSize EQU 68
 ChillTanTileDataSize EQU ChillTanTileSize * 16
 
+
+thanks_tile_map_size EQU $0400
+thanks_tile_map_width EQU $20
+thanks_tile_map_height EQU $20
+
+thanks_tile_data_size EQU $03C0
+thanks_tile_count EQU $3C
+
 ;addresses
 N_ShadowOAM equ $c100
