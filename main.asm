@@ -10,6 +10,9 @@ SECTION "Header",ROM0[$1]
 SECTION "vBlank IRQ",ROM0[$40]
 vBlankIRQ:
     jp vBlankRoutine
+SECTION "LCD IRQ",ROM0[$48]
+LCDIRQ:
+    jp lcdRoutine
 SECTION "Timer IRQ",ROM0[$50]
 timerIRQ:
     jp timerRoutine
@@ -30,7 +33,7 @@ jp codeInit
 ;===========================================================================
 SECTION "code",ROM0[$150]
 db "AhoyGB code/music by pegmode, Art by Gaplan, Original song by Houshou Marine"
-codeInit:
+codeInit:;Initalize the ROM and load/init main screen
     di
     ld sp,$FFCC
     xor a
@@ -38,13 +41,22 @@ codeInit:
     ld [BounceOffset], a;init bounce
     ld [ShortBounceOffset], a
     ld [CurrentScreen], a ;main screen
+    ld [AnimFrame], a
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
     ld a, $c4;ahoy tma
     ld [rTMA],a
-    ld a, %101;enable timer and vblank
+
 .continueInit
+    ld a, BG_ANIM_FRAMERATE
+    ld [AnimWaitFrame], a
+    ld a, 144-8;last row
+    ld [rLYC], a
+    ld a, [rSTAT]
+    set 6,a
+    ld [rSTAT], a
+    ld a, %111;enable timer and vblank and lyc
     ld [rIE], a
     call DMEngineInit
     ld a, 1
@@ -61,13 +73,13 @@ codeInit:
     ld bc, $800
     call clearMem
     call LoadNormalPallet
-    ld hl, PlaceholderBG_map_data
+    ld hl, finalBG_map_data
     ld bc, _SCRN0
-    ld de, PlaceholderBG_tile_map_size
+    ld de, finalBG_tile_map_size
     call MemCopyLong
-    ld hl, PlaceholderBG_tile_data
+    ld hl, finalBG_tile_data
     ld bc, $8000
-    ld de, PlaceholderBG_tile_data_size
+    ld de, finalBG_tile_data_size
     call MemCopyLong
     ;smode
     ld a, [SMode]
@@ -78,10 +90,23 @@ codeInit:
 .normalLoad
     ;start 0x8520, tiles 52-65
     ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
+    
     ld hl,marineSprite1_tile_data
-    ld bc,$8520
+    ;ld bc,$8520 ; bc is already set to the next tile address
     ld de, marineSprite1_tile_data_size
     call MemCopyLong
+    ld hl, mClosedEyes_tile_data
+    ld d, mEyes_tile_data_size
+    call MemCopy
+    ld hl, mHappyEyes_tile_data
+    ld d, mEyes_tile_data_size
+    call MemCopy
+    ld hl, mSmugEyes_tile_data
+    ld d, mEyes_tile_data_size
+    call MemCopy
+    ld hl, birds_tile_data
+    ld d, birds_tile_data_size
+    call MemCopy
     ld hl, MarineMetaSprite
     ld bc, $FE00
     ld d, 80
@@ -90,6 +115,12 @@ codeInit:
     ld bc, $C100 ;DMA stuff
     ld d, 80
     call MemCopy
+;TEST VALUES FOR BG ANIM
+    ld hl, ChillTanFontTile
+    ld bc, $9000
+    ld de, ChillTanTileDataSize
+    call MemCopyLong
+
 .endSpriteLoad
     ld a, FADE_WAIT_LENGTH
     ld [FadeCounter], a
@@ -150,6 +181,15 @@ timerRoutine:
     ld [rROMB0], a
     reti
 
+lcdRoutine:
+    ;call WaitBlank
+    ld a, [rLCDC]
+    set 3,a
+    res 4,a
+    ld [rLCDC],a
+    reti
+
+
 ;OTHER
 ;===========================================================================
 
@@ -160,31 +200,32 @@ include "videoUtils.asm"
 include "DMGBVGM.asm"
 include "metaSpriteUtils.asm"
 
+
 bounceSpriteTable:;vertical
     db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
 shortBounceSpriteTable:
     db $FF,$4C,$49,$47,$46,$46,$47,$49,$4C,$50
 
 MarineMetaSprite:
-    db 80, 16, $52, 0
-    db 80, 24, $53, 0
-    db 80, 32, $54, 0
-    db 80, 40, $55, 0
-    db 88, 16, $56, 0
-    db 88, 24, $57, 0
-    db 88, 32, $58, 0
-    db 88, 40, $59, 0
-    db 96, 16, $5a, 0
-    db 96, 24, $5b, 0
-    db 96, 32, $5c, 0
-    db 96, 40, $5d, 0
-    db 104, 16, $5e, 0
-    db 104, 24, $5f, 0
-    db 104, 32, $60, 0
-    db 104, 40, $61, 0
+    db 80, 16, $BA, 0
+    db 80, 24, $BB, 0
+    db 80, 32, $BC, 0
+    db 80, 40, $BD, 0
+    db 88, 16, $BE, 0
+    db 88, 24, $BF, 0
+    db 88, 32, $C0, 0
+    db 88, 40, $C1, 0
+    db 96, 16, $C2, 0
+    db 96, 24, $C3, 0
+    db 96, 32, $C4, 0
+    db 96, 40, $C5, 0
+    db 104, 16, $C6, 0
+    db 104, 24, $C7, 0
+    db 104, 32, $C8, 0
+    db 104, 40, $C9, 0
     db 112, 16, $0, 0;keep for simplicity
-    db 112, 24, $62, 0
-    db 112, 32, $63, 0
+    db 112, 24, $CA, 0
+    db 112, 32, $CB, 0
     db 112, 40, $0, 0
 
 DebugMetaSprite:
@@ -212,10 +253,15 @@ DebugMetaSprite:
 ;GRAPHICS DATA
 ;===========================================================================
 SECTION "Graphics Data",ROMX,BANK[1]
-include "Graphics/PlaceholderBG.asm"
 include "Graphics/ChillTanFontTiles.asm"
 include "Graphics/marineSprite1.asm"
 include "Graphics/debugSprite.asm"
+include "Graphics/finalBG.asm"
+include "Graphics/birds.asm"
+include "Graphics/MarineFace/mClosedEyes.asm"
+include "Graphics/MarineFace/mHappyEyes.asm"
+include "Graphics/MarineFace/mSmugEyes.asm"
+
 creditsText:
 incbin "Graphics/creditsText.txt"
 ;MUSIC DATA

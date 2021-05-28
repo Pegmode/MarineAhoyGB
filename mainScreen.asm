@@ -1,4 +1,15 @@
+
+BG_ANIM_TILE_SIZE equ 20
+ANIM_BG_ANIM_FRAMES equ 4;number of frames in  animation MAX 5
+MAXFRAME equ BG_ANIM_TILE_SIZE*ANIM_BG_ANIM_FRAMES;frames * animation steps
+LAST_BG_ROW_START_ADR equ $9E20
+
+
+
 UpdateMainScreen:
+    ld a, %10010011;reset from BG animation
+    ld [rLCDC], a
+    call updateBGAnimFrame
     call StartDMATransfer
 .checkCurrentBounceFrame
     ld a, [BounceOffset]
@@ -61,6 +72,8 @@ UpdateMainScreen:
     ret
 
 UpdateFadeScreen:
+    ld a, %10010011;reset from BG animation
+    ld [rLCDC], a
     call FadePallet
     cp 0
     jr nz,.endFadeUpdate
@@ -87,3 +100,30 @@ SLoad:
     ld d, 80
     call MemCopy
     ret
+
+updateBGAnimFrame:
+    ld a, [AnimWaitFrame]
+    cp 0
+    jr z, .isUpdateFrame
+    dec a
+    ld [AnimWaitFrame], a
+    jr .exit
+.isUpdateFrame
+    ld d, BG_ANIM_TILE_SIZE
+    ld a, [AnimFrame]
+    cp MAXFRAME 
+    jr nz, .startNewFrame
+    xor a
+.startNewFrame
+    ld hl, LAST_BG_ROW_START_ADR
+.loadTile 
+    ld [hl+], a
+    inc a
+    dec d
+    jr nz, .loadTile
+    ld [AnimFrame], a
+    ld a, BG_ANIM_FRAMERATE
+    ld [AnimWaitFrame], a
+
+.exit
+ret

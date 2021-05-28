@@ -19,3 +19,5 @@ SModePTR:            ds 2
 DropBouncePTR:       ds 2
 DropBounceState:     ds 1
 ShortBounceOffset:   ds 1
+AnimFrame: ds 1
+AnimWaitFrame: ds 1

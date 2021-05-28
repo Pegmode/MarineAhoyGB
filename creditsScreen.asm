@@ -30,6 +30,8 @@ CreditsScreenInit:
     ld [hl], e
     ld a, 1
     ld [DropBounceState], a
+    ld a, %101
+    ld [rIE], a
     ld a, %11110001
     ld [rLCDC], a
     ret
