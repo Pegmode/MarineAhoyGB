@@ -1,9 +1,11 @@
 #sprite builder
-startTile = 82
+startTile = 0xBA
 xLen = 4
 yLen = 5
 metaX = 16
-metaY = 80
+metaY = 80-12
+
+ignoreTiles = [16,19]
 
 numtiles = xLen*yLen
 
@@ -18,6 +20,9 @@ for row in range(yLen):
   for col in range(xLen):
     currentX = metaX+col*8
     #print("Row:{} Col:{} ".format(row,col))
+    if row*xLen + col in ignoreTiles:
+      print(buildSpriteString(currentX,currentY,0))
+      continue
     print(buildSpriteString(currentX,currentY,currentTile))
     currentTile += 1
   currentX = metaX

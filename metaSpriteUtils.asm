@@ -139,7 +139,7 @@ BounceAdvance:
     call moveMetaSpriteY
     pop de
     pop af
-    cp $50;starting position for sprite
+    cp MARINE_INIT_HEIGHT;starting position for sprite
     jr z,.bounceEnd
     inc d;not end of table
     ld a, d
@@ -164,7 +164,7 @@ ShortBounceAdvance:
     call moveMetaSpriteY
     pop de
     pop af
-    cp $50;starting position for sprite
+    cp MARINE_INIT_HEIGHT;starting position for sprite
     jr z,.bounceEnd
     inc d;not end of table
     ld a, d
@@ -173,4 +173,26 @@ ShortBounceAdvance:
 .bounceEnd;end of table
     xor a
     ld [ShortBounceOffset], a
+    ret
+
+
+;swap the eye tiles of the current metasprite in shadow OAM
+;b = left tile index, c = right tile index
+;assumes eye tile indices are constant $c116,$c11a
+swapEyes:
+    ld a,[$c117]
+    bit 5, a
+    jr nz, .reverseSwap
+.normalSwap
+    ld hl, $c116
+    ld [hl], b
+    ld hl, $c11a
+    ld [hl], c
+    ret
+.reverseSwap
+    ld hl, $c116
+    ld [hl], c
+    ld hl, $c11a
+    ld [hl], b
+    ret
     ret

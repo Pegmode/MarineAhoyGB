@@ -1,10 +1,19 @@
+# pushV = 8
+# p = pushV
+# v = pushV
+# g = -1
+# isSprite = True
+# spriteStart = 80#change this to suit your situtation
+
+
 pushV = 8
 p = pushV
 v = pushV
 g = -1
 
+
 isSprite = True
-spriteStart = 80#change this to suit your situtation
+spriteStart = 68#change this to suit your situtation
 positions = []
 
 

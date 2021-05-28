@@ -121,7 +121,28 @@ codeInit:;Initalize the ROM and load/init main screen
     ld de, ChillTanTileDataSize
     call MemCopyLong
 
-.endSpriteLoad
+.endSpriteLoad; End non special load
+    ;load birds
+    ld bc, BIRDSPRITE_L_INDEX  + N_ShadowOAM
+    ld hl, birdSpriteInitTable
+    ld d, 12
+    call MemCopy
+    ld hl,BirdTimer1
+    xor a
+    ld [hl+], a
+    ld a,30
+    ld [hl+], a
+    ld a,15
+    ld [hl], a
+    ld hl, BirdOffset1
+    xor a
+    ld [hl+], a
+    ld a,128
+    ld [hl+], a
+    ld a,90
+    ld [hl], a
+    call moveBirds
+
     ld a, FADE_WAIT_LENGTH
     ld [FadeCounter], a
     ;obj pallet
@@ -138,6 +159,7 @@ main:;main loop
     halt
     jp main
 
+
 ;INTERRUPTS
 ;===========================================================================
 vBlankRoutine:
@@ -145,6 +167,7 @@ vBlankRoutine:
     cp MAIN_SCREEN
     jr nz,.checkFadeScreen
     call UpdateMainScreen
+    call updateBirds
     reti
 .checkFadeScreen
     cp FADE_MAIN_TRANSITION
@@ -200,33 +223,41 @@ include "videoUtils.asm"
 include "DMGBVGM.asm"
 include "metaSpriteUtils.asm"
 
+birdSpriteInitTable:
+    db 20,$80,$D2,0
+    db 30,$8a,$D3,0
+    db 16,$8f,$D3,0
 
-bounceSpriteTable:;vertical
-    db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
-shortBounceSpriteTable:
-    db $FF,$4C,$49,$47,$46,$46,$47,$49,$4C,$50
+; bounceSpriteTable:;vertical
+;     db  $FF,$48,$41,$3B,$36,$32,$2F,$2D,$2C,$2C,$2D,$2F,$32,$36,$3B,$41,$48,$50
+ shortBounceSpriteTable:
+     db $FF,$4C-$C,$49-$C,$47-$C,$46-$C,$46-$C,$47-$C,$49-$C,$4C-$C,$50-$C
+ bounceSpriteTable:;vertical
+     db  $FF,$3C,$35,$2F,$2A,$26,$23,$21,$20,$20,$21,$23,$26,$2A,$2F,$35,$3C,$44;Last value must be MARINE_INIT_HEIGHT, first value must be $FF
 
 MarineMetaSprite:
-    db 80, 16, $BA, 0
-    db 80, 24, $BB, 0
-    db 80, 32, $BC, 0
-    db 80, 40, $BD, 0
-    db 88, 16, $BE, 0
-    db 88, 24, $BF, 0
-    db 88, 32, $C0, 0
-    db 88, 40, $C1, 0
-    db 96, 16, $C2, 0
-    db 96, 24, $C3, 0
-    db 96, 32, $C4, 0
-    db 96, 40, $C5, 0
-    db 104, 16, $C6, 0
-    db 104, 24, $C7, 0
-    db 104, 32, $C8, 0
-    db 104, 40, $C9, 0
-    db 112, 16, $0, 0;keep for simplicity
-    db 112, 24, $CA, 0
-    db 112, 32, $CB, 0
-    db 112, 40, $0, 0
+    db 68, 16, $ba, 0
+    db 68, 24, $bb, 0
+    db 68, 32, $bc, 0
+    db 68, 40, $bd, 0
+    db 76, 16, $be, 0
+    db 76, 24, $bf, 0
+    db 76, 32, $c0, 0
+    db 76, 40, $c1, 0
+    db 84, 16, $c2, 0
+    db 84, 24, $c3, 0
+    db 84, 32, $c4, 0
+    db 84, 40, $c5, 0
+    db 92, 16, $c6, 0
+    db 92, 24, $c7, 0
+    db 92, 32, $c8, 0
+    db 92, 40, $c9, 0
+    db 100, 16, $0, 0;keep for simplicity
+    db 100, 24, $ca, 0
+    db 100, 32, $cb, 0
+    db 100, 40, $0, 0
+
+
 
 DebugMetaSprite:
     db 80, 16, $52, 0
@@ -249,6 +280,24 @@ DebugMetaSprite:
     db 112, 24, $63, 0
     db 112, 32, $64, 0
     db 112, 40, $65, 0
+
+BirdMovementTable:
+    db 120, 120, 121, 121, 122, 122, 123, 123, 124, 124, 125, 125, 126, 126, 127, 127, 128
+    db 128, 129, 129, 129, 130, 130, 131, 131, 131, 132, 132, 132, 133, 133, 133, 134, 134
+    db 134, 134, 135, 135, 135, 135, 135, 135, 135, 136, 136, 136, 136, 136, 136, 136, 136
+    db 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 135, 135
+    db 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 135, 134, 134, 134, 134, 134, 134
+    db 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 135, 135, 135, 135
+    db 135, 135, 135, 135, 135, 136, 136, 136, 136, 136, 136, 137, 137, 137, 137, 137, 137
+    db 138, 138, 138, 138, 138, 139, 139, 139, 139, 140, 140, 140, 140, 140, 140, 141, 141
+    db 141, 141, 141, 141, 141, 142, 142, 142, 142, 142, 142, 142, 142, 142, 142, 142, 142
+    db 142, 142, 142, 142, 142, 142, 142, 142, 141, 141, 141, 141, 141, 141, 140, 140, 140
+    db 140, 139, 139, 139, 138, 138, 138, 137, 137, 137, 136, 136, 136, 135, 135, 135, 134
+    db 134, 133, 133, 132, 132, 132, 131, 131, 130, 130, 130, 129, 129, 128, 128, 128, 127
+    db 127, 126, 126, 126, 125, 125, 125, 124, 124, 124, 123, 123, 123, 122, 122, 122, 122
+    db 121, 121, 121, 121, 121, 120, 120, 120, 120, 120, 120, 120, 119, 119, 119, 119, 119
+    db 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119
+    db 119
 
 ;GRAPHICS DATA
 ;===========================================================================
