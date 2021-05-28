@@ -116,7 +116,7 @@ SLoad:
     ;start 0x8520, tiles 52-65
     ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
     ld hl,debugSprite_tile_data
-    ld bc,$8520
+    ld bc,$8BA0
     ld de, debugSprite_tile_data_size
     call MemCopyLong
     ld hl, DebugMetaSprite
