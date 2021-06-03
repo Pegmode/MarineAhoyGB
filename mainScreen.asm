@@ -1,4 +1,3 @@
-
 BG_ANIM_TILE_SIZE equ 20
 ANIM_BG_ANIM_FRAMES equ 4;number of frames in  animation MAX 5
 MAXFRAME equ BG_ANIM_TILE_SIZE*ANIM_BG_ANIM_FRAMES;frames * animation steps
