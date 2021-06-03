@@ -3,10 +3,10 @@ Game Boy ROM to play [Ahoy!! 我ら宝鐘海賊団 by Houshou Marine](https://yo
 Uses [Deflemask GBVGM](https://github.com/Pegmode/-DeflemaskGBVGM-) for music playback and event timing.
 
 Code and GB music by Pegmode  
-Art by Gaplan  
+Art by [Gaplan](https://twitter.com/Gaplan1337)
 
 ## Build instructions
-Nake sure [RGBDS](https://github.com/gbdev/rgbds) is unpacked into the projects root directory.  
+Make sure [RGBDS](https://github.com/gbdev/rgbds) is unpacked into the projects root directory.  
 To build run `buildDesktop.bat`. You will need to edit the path under bgb in `buildDesktop.bat` to match your [BGB](https://bgb.bircd.org/)
 path. It does not have to be the 64-bit version. 
 
