@@ -11,6 +11,14 @@ CreditsScreenInit:
     ld bc, _VRAM
     ld de, ChillTanTileDataSize
     call MemCopyLong
+    ld hl, thanks_tile_data
+    ld de, thanks_tile_data_size 
+    call MemCopyLong
+    ld hl, thanks_map_data
+    ld bc, $9DC0;start tilemap address
+    ld de, thanks_tile_map_size
+    call MemCopyLong
+
     call LoadNormalPallet
     ld de, $9C21
     call writeCreditsTextToScreen

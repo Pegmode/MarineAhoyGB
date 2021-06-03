@@ -1,4 +1,3 @@
-
 BG_ANIM_TILE_SIZE equ 20
 ANIM_BG_ANIM_FRAMES equ 4;number of frames in  animation MAX 5
 MAXFRAME equ BG_ANIM_TILE_SIZE*ANIM_BG_ANIM_FRAMES;frames * animation steps
@@ -63,11 +62,39 @@ UpdateMainScreen:
     ret
 .checkShortBounceEvent
     cp EVENT_SHORT_BOUNCE
-    jr nz, .SyncEventExit
+    jr nz, .checkEyesClosed
     ld a, 1
     ld [ShortBounceOffset] ,a
     xor a
     ldh [DMVGM_SYNC_HIGH_ADDRESS],a;reset sync register
+.checkEyesClosed
+    cp EVENT_EYES_CLOSED
+    jr nz, .checkSmugEyes
+    ld b, $CC
+    ld c, $CD
+    call swapEyes
+    ret
+.checkSmugEyes
+    cp EVENT_EYES_SMUG
+    jr nz, .checkHappyEyes
+    ld b, $D0
+    ld c, $D1
+    call swapEyes
+    ret
+.checkHappyEyes
+    cp EVENT_EYES_HAPPY
+    jr nz, .checkNormalEyes
+    ld b, $CE
+    ld c, $CF
+    call swapEyes
+    ret
+.checkNormalEyes
+    cp EVENT_EYES_NORMAL
+    jr nz, .SyncEventExit
+    ld b, $BF
+    ld c, $C0
+    call swapEyes
+    ret
 .SyncEventExit
     ret
 
@@ -88,7 +115,7 @@ SLoad:
     ;start 0x8520, tiles 52-65
     ;these values are temp clamped so when the graphics get updated this needs to be seriously changed
     ld hl,debugSprite_tile_data
-    ld bc,$8520
+    ld bc,$8BA0
     ld de, debugSprite_tile_data_size
     call MemCopyLong
     ld hl, DebugMetaSprite
@@ -127,3 +154,82 @@ updateBGAnimFrame:
 
 .exit
 ret
+
+updateBirds:
+    ;This would be so much nicer with a macro but people got mad at macros :(
+    ld a, [BirdTimer1]
+    cp BIRD_ANIM_FRAMERATE
+    jr z,.updateBird1
+    inc a
+    ld [BirdTimer1],a
+    jr .handleBird2
+.updateBird1
+    xor a
+    ld [BirdTimer1],a
+    ld a,[BIRDSPRITE_L_INDEX  + N_ShadowOAM + 2]
+    xor 1
+    ld [BIRDSPRITE_L_INDEX  + N_ShadowOAM + 2],a
+    call moveBirds
+.handleBird2
+    ld a, [BirdTimer2]
+    cp BIRD_ANIM_FRAMERATE
+    jr z,.updateBird2
+    inc a
+    ld [BirdTimer2],a
+    jr .handleBird3
+.updateBird2
+    xor a
+    ld [BirdTimer2],a
+    ld a,[BIRDSPRITE_L_INDEX  + N_ShadowOAM + 2 + 4]
+    xor 1
+    ld [BIRDSPRITE_L_INDEX  + N_ShadowOAM + 2 + 4],a
+    call moveBirds
+.handleBird3
+    ld a, [BirdTimer3]
+    cp BIRD_ANIM_FRAMERATE
+    jr z,.updateBird3
+    inc a
+    ld [BirdTimer3],a
+    ret
+.updateBird3
+    xor a
+    ld [BirdTimer3],a
+    ld a,[BIRDSPRITE_L_INDEX  + N_ShadowOAM + 2 + 8]
+    xor 1
+    ld [BIRDSPRITE_L_INDEX  + N_ShadowOAM + 2 + 8],a
+    call moveBirds
+    ret
+
+moveBirds:
+    ld b, 0
+    ;bird 1
+    ld a, [BirdOffset1]
+    ld c, a
+    ld hl, BirdMovementTable
+    add hl, bc
+    ld a, [hl]
+    ld [BIRDSPRITE_L_INDEX  + N_ShadowOAM + 1], a
+    inc c
+    ld a, c
+    ld [BirdOffset1], a
+    ;bird2
+    ld a, [BirdOffset2]
+    ld c, a
+    ld hl, BirdMovementTable
+    add hl, bc
+    ld a, [hl]
+    ld [BIRDSPRITE_L_INDEX  + N_ShadowOAM + 1 + 4], a
+    inc c
+    ld a, c
+    ld [BirdOffset2], a
+    ;bird3
+    ld a, [BirdOffset3]
+    ld c, a
+    ld hl, BirdMovementTable
+    add hl, bc
+    ld a, [hl]
+    ld [BIRDSPRITE_L_INDEX  + N_ShadowOAM + 1 + 8], a
+    inc c
+    ld a, c
+    ld [BirdOffset3], a
+    ret
