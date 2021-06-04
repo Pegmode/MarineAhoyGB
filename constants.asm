@@ -52,6 +52,8 @@ thanks_tile_count EQU $38
 
 waveFrames_tile_data_size EQU $60
 waveFrames_tile_count EQU $06
+BG_ANIM_START_TILE equ $D4
+BG_ANIM_END_TILE equ $D9
 
 ;addresses
 N_ShadowOAM equ $c100

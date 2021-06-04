@@ -19,11 +19,11 @@ SModePTR:            ds 2
 DropBouncePTR:       ds 2
 DropBounceState:     ds 1
 ShortBounceOffset:   ds 1
-;AnimFrame: ds 1
-;AnimWaitFrame: ds 1
 BirdTimer1: ds 1
 BirdTimer2: ds 1
 BirdTimer3: ds 1
 BirdOffset1: ds 1
 BirdOffset2: ds 1
 BirdOffset3: ds 1
+BGAnimFrame: ds 1;position in LUT
+BGAnimDir: ds 1;0 = forwards, 1 = backwards

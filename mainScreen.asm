@@ -126,10 +126,17 @@ SLoad:
     ret
 
 updateBGAnimFrame:
-;map start address 
-
+    ld a, [BGAnimFrame]
+    ld b, BG_ANIM_TILE_SIZE
+.writeTile
+    ld a, 
 .exit
-ret
+    ret
+
+BGAnimLUT:
+    DB $D4, $D4, $D4, $D4, $D4, $D4, $D5, $D5, $D5, $D6, $D6, $D6, $D7, $D7, $D7, $D8
+    DB $D8, $D8, $D9, $D9, $D9, $D9, $D9, $D9, $D8, $D8, $D8, $D7, $D7, $D7, $D6, $D6
+    DB $D6, $D5, $D5, $D5, $00
 
 updateBirds:
     ;This would be so much nicer with a macro but people got mad at macros :(

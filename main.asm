@@ -39,7 +39,9 @@ codeInit:;Initalize the ROM and load/init main screen
     ld [BounceOffset], a;init bounce
     ld [ShortBounceOffset], a
     ld [CurrentScreen], a ;main screen
-
+    ;wave anim
+    ld [BGAnimDir], a
+    ld [BGAnimFrame], a
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
