@@ -127,16 +127,58 @@ SLoad:
 
 updateBGAnimFrame:
     ld a, [BGAnimFrame]
-    ld b, BG_ANIM_TILE_SIZE
+    ld b, 0
+    ld c, a
+    ld hl, BGAnimLUT
+    add hl,bc
+    ld a, [hl]
+    cp 0
+    jr nz, .writeTile
+    ;at end of lut
+    ld c,0
+    ld a, BG_ANIM_START_TILE
 .writeTile
-    ld a, 
+    ld hl, BG_ANIM_MAP_ADR
+    ;no loops because of the need for faster timing due to async music timer
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    ld [hl+], a
+    inc c
+    ld a, c
+    ld [BGAnimFrame], a
+
 .exit
     ret
 
 BGAnimLUT:
-    DB $D4, $D4, $D4, $D4, $D4, $D4, $D5, $D5, $D5, $D6, $D6, $D6, $D7, $D7, $D7, $D8
-    DB $D8, $D8, $D9, $D9, $D9, $D9, $D9, $D9, $D8, $D8, $D8, $D7, $D7, $D7, $D6, $D6
-    DB $D6, $D5, $D5, $D5, $00
+    DB $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4
+    DB $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4
+    DB $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D4, $D5, $D5, $D5, $D5, $D5, $D5, $D5, $D5
+    DB $D5, $D5, $D6, $D6, $D6, $D6, $D6, $D6, $D6, $D6, $D6, $D6, $D7, $D7, $D7, $D7
+    DB $D7, $D7, $D7, $D7, $D7, $D7, $D8, $D8, $D8, $D8, $D8, $D8, $D8, $D8, $D8, $D8
+    DB $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9
+    DB $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9
+    DB $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D9, $D8, $D8, $D8, $D8, $D8, $D8, $D8, $D8
+    DB $D8, $D8, $D7, $D7, $D7, $D7, $D7, $D7, $D7, $D7, $D7, $D7, $D6, $D6, $D6, $D6
+    DB $D6, $D6, $D6, $D6, $D6, $D6, $D5, $D5, $D5, $D5, $D5, $D5, $D5, $D5, $D5, $D5
+    DB $00
 
 updateBirds:
     ;This would be so much nicer with a macro but people got mad at macros :(

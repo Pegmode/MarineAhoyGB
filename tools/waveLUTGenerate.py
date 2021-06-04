@@ -2,8 +2,9 @@
 #User vars
 START_INDEX = 0xD4 #animation start tile index
 END_INDEX = 0xD9 #animation end tile index
-FRAME_RATE = 3 #animation frame rate
-DOUBLE_ENDS = True #do we double frames for last and first tile?
+FRAME_RATE = 10 #animation frame rate
+EXTEND_ENDS = True #do we double frames for last and first tile?
+EXTEND_MULT = 3
 LOOP_Sentinal = 0 #value to use for to determine when to loop
 
 
@@ -35,8 +36,10 @@ def generateDirection(animTable,direction,beginIndex):
     animSize = END_INDEX - START_INDEX
     for i in range(animSize):
         currentFrame = beginIndex + i*direction
-        if (DOUBLE_ENDS) & (i == 0):
-            addFrame(animTable,currentFrame)
+        if (EXTEND_ENDS) & (i == 0):
+            for j in range(EXTEND_MULT):
+                addFrame(animTable,currentFrame)
+                continue
         addFrame(animTable,currentFrame)
 
 def buildLUT():
