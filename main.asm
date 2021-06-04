@@ -10,9 +10,7 @@ SECTION "Header",ROM0[$1]
 SECTION "vBlank IRQ",ROM0[$40]
 vBlankIRQ:
     jp vBlankRoutine
-SECTION "LCD IRQ",ROM0[$48]
-LCDIRQ:
-    jp lcdRoutine
+    
 SECTION "Timer IRQ",ROM0[$50]
 timerIRQ:
     jp timerRoutine
@@ -56,7 +54,7 @@ codeInit:;Initalize the ROM and load/init main screen
     ld a, [rSTAT]
     set 6,a
     ld [rSTAT], a
-    ld a, %111;enable timer and vblank and lyc
+    ld a, %101;enable timer and vblank and lyc
     ld [rIE], a
     call DMEngineInit
     ld a, 1
@@ -107,6 +105,10 @@ codeInit:;Initalize the ROM and load/init main screen
     ld hl, birds_tile_data
     ld d, birds_tile_data_size
     call MemCopy
+    ld hl, waveFrames_tile_data
+    ld d, waveFrames_tile_data_size
+    call MemCopy;starts at $D4
+
     ld hl, MarineMetaSprite
     ld bc, $FE00
     ld d, 80
@@ -115,11 +117,6 @@ codeInit:;Initalize the ROM and load/init main screen
     ld bc, $C100 ;DMA stuff
     ld d, 80
     call MemCopy
-;TEST VALUES FOR BG ANIM
-    ld hl, ChillTanFontTile
-    ld bc, $9000
-    ld de, ChillTanTileDataSize
-    call MemCopyLong
 
 .endSpriteLoad; End non special load
     ;load birds
@@ -204,13 +201,6 @@ timerRoutine:
     ld [rROMB0], a
     reti
 
-lcdRoutine:
-    ;call WaitBlank
-    ld a, [rLCDC]
-    set 3,a
-    res 4,a
-    ld [rLCDC],a
-    reti
 
 
 ;OTHER
@@ -311,6 +301,7 @@ include "Graphics/thanks.asm"
 include "Graphics/MarineFace/mClosedEyes.asm"
 include "Graphics/MarineFace/mHappyEyes.asm"
 include "Graphics/MarineFace/mSmugEyes.asm"
+include "Graphics/waveFrames.asm"
 
 creditsText:
 incbin "Graphics/creditsText.txt"

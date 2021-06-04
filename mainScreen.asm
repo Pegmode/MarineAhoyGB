@@ -6,8 +6,6 @@ LAST_BG_ROW_START_ADR equ $9E20
 
 
 UpdateMainScreen:
-    ld a, %10010011;reset from BG animation
-    ld [rLCDC], a
     call updateBGAnimFrame
     call StartDMATransfer
 .checkCurrentBounceFrame
