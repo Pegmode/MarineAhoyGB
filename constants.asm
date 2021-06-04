@@ -17,17 +17,9 @@ EVENT_EYES_SMUG EQU 6
 EVENT_EYES_HAPPY EQU 7
 EVENT_EYES_NORMAL EQU 8
 
-
 BIRDSPRITE_L_INDEX EQU $50
 
 MARINE_INIT_HEIGHT EQU $44
-
-PlaceholderBG_tile_map_size EQU $0400
-PlaceholderBG_tile_map_width EQU $20
-PlaceholderBG_tile_map_height EQU $20
-
-PlaceholderBG_tile_data_size EQU $0520
-PlaceholderBG_tile_count EQU $52
 
 debugSprite_tile_data_size EQU $0140 
 
@@ -49,18 +41,17 @@ mEyes_tile_count EQU $02
 birds_tile_data_size EQU $20
 birds_tile_count EQU $02
 
-
-
 ChillTanTileSize EQU 68
 ChillTanTileDataSize EQU ChillTanTileSize * 16
-
 
 thanks_tile_map_size EQU $0400
 thanks_tile_map_width EQU $20
 thanks_tile_map_height EQU $20
+thanks_tile_data_size EQU $0380
+thanks_tile_count EQU $38
 
-thanks_tile_data_size EQU $03C0
-thanks_tile_count EQU $3C
+waveFrames_tile_data_size EQU $60
+waveFrames_tile_count EQU $06
 
 ;addresses
 N_ShadowOAM equ $c100
