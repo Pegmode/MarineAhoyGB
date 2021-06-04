@@ -10,7 +10,7 @@ SECTION "Header",ROM0[$1]
 SECTION "vBlank IRQ",ROM0[$40]
 vBlankIRQ:
     jp vBlankRoutine
-    
+
 SECTION "Timer IRQ",ROM0[$50]
 timerIRQ:
     jp timerRoutine
@@ -39,7 +39,7 @@ codeInit:;Initalize the ROM and load/init main screen
     ld [BounceOffset], a;init bounce
     ld [ShortBounceOffset], a
     ld [CurrentScreen], a ;main screen
-    ld [AnimFrame], a
+
 .setTMAMode
 	ld a, $04;ahoy tac
     ld [rTAC],a
@@ -47,8 +47,6 @@ codeInit:;Initalize the ROM and load/init main screen
     ld [rTMA],a
 
 .continueInit
-    ld a, BG_ANIM_FRAMERATE
-    ld [AnimWaitFrame], a
     ld a, 144-8;last row
     ld [rLYC], a
     ld a, [rSTAT]

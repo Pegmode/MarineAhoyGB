@@ -1,7 +1,6 @@
-BG_ANIM_TILE_SIZE equ 20
-ANIM_BG_ANIM_FRAMES equ 4;number of frames in  animation MAX 5
-MAXFRAME equ BG_ANIM_TILE_SIZE*ANIM_BG_ANIM_FRAMES;frames * animation steps
-LAST_BG_ROW_START_ADR equ $9E20
+BG_ANIM_TILE_SIZE equ $13
+ANIM_BG_ANIM_FRAMES equ 6
+BG_ANIM_MAP_ADR equ $9A20
 
 
 
@@ -127,28 +126,7 @@ SLoad:
     ret
 
 updateBGAnimFrame:
-    ld a, [AnimWaitFrame]
-    cp 0
-    jr z, .isUpdateFrame
-    dec a
-    ld [AnimWaitFrame], a
-    jr .exit
-.isUpdateFrame
-    ld d, BG_ANIM_TILE_SIZE
-    ld a, [AnimFrame]
-    cp MAXFRAME 
-    jr nz, .startNewFrame
-    xor a
-.startNewFrame
-    ld hl, LAST_BG_ROW_START_ADR
-.loadTile 
-    ld [hl+], a
-    inc a
-    dec d
-    jr nz, .loadTile
-    ld [AnimFrame], a
-    ld a, BG_ANIM_FRAMERATE
-    ld [AnimWaitFrame], a
+;map start address 
 
 .exit
 ret
