@@ -1,6 +1,6 @@
 # MarineAhoyGB
 Game Boy ROM to play [Ahoy!! 我ら宝鐘海賊団 by Houshou Marine](https://youtu.be/e7VK3pne8N4).  
-Uses [Deflemask GBVGM](https://github.com/Pegmode/-DeflemaskGBVGM-) for music playback and event timing.  
+Uses my custom .vgm playback engine [Deflemask GBVGM](https://github.com/Pegmode/-DeflemaskGBVGM-) for music playback and event timing.  
 
 Download the .gb ROM [HERE](https://github.com/Pegmode/MarineAhoyGB/releases/download/1.0/ahoyGB.gb)
 
