@@ -9,7 +9,7 @@ Download the .gb ROM [HERE](https://github.com/Pegmode/MarineAhoyGB/releases/dow
 [Full hardware video recording](https://youtu.be/bS_inEQkhss)  
 
 Code and GB music by Pegmode  
-Art by [Gaplan](https://twitter.com/Gaplan1337)
+Art by [Gaplan](https://twitter.com/gaplanderz)
 
 ## Build instructions
 Make sure [RGBDS](https://github.com/gbdev/rgbds) is unpacked into the projects root directory.  
